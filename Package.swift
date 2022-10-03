@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "PresentFlow",
+    name: "present-flow",
     platforms: [
         .macOS(.v12),
         .iOS(.v15),

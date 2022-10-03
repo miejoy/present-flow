@@ -21,6 +21,6 @@ jobs:
     - name: Run tests
       run: swift test -v --enable-code-coverage
     - name: Convert code coverage
-      run: xcrun llvm-cov export -format="lcov" -instr-profile=$(find .build -name default.profdata) $(find .build -name PresentFlowPackageTests) > info.lcov
+      run: xcrun llvm-cov export -format="lcov" -instr-profile=$(find .build -name default.profdata) $(find .build -name present-flowPackageTests) > info.lcov
     - name: Upload coverage reports
       uses: codecov/codecov-action@v3
