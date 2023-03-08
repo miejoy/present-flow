@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import ViewFlow
 
 struct RegisteredPresentableViewMaker<InitData> : PresentedViewMaker {
-    var route: PresentRoute<InitData>
+    var route: ViewRoute<InitData>
     var data: InitData
     
     func makeView() -> AnyView {

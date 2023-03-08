@@ -115,7 +115,7 @@ extension Store where State == PresentState {
     /// - Parameter route: 需要展示界面的路由
     /// - Parameter data: 初始化展示界面需要的数据
     @inlinable
-    public func present<InitData>(_ route: PresentRoute<InitData>, _ data: InitData) {
+    public func present<InitData>(_ route: ViewRoute<InitData>, _ data: InitData) {
         self.send(action: .present(route, data))
     }
     
@@ -123,7 +123,7 @@ extension Store where State == PresentState {
     ///
     /// - Parameter route: 需要展示界面的路由
     @inlinable
-    public func present(_ route: PresentRoute<Void>) {
+    public func present(_ route: ViewRoute<Void>) {
         self.send(action: .present(route))
     }
     

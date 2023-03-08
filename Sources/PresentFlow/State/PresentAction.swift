@@ -6,18 +6,19 @@
 //
 
 import DataFlow
+import ViewFlow
 
 /// 展示相关事件
 public struct PresentAction: Action {
     /// 展示相关事件
     struct InnerPresentAction {
-        let route: AnyPresentRoute
+        let route: AnyViewRoute
         let viewMaker: PresentedViewMaker
         let navigationState: NavigationState?
         var isFrozen = false
         var isFullCover = false
         
-        var baseOnRoute: AnyPresentRoute? = nil
+        var baseOnRoute: AnyViewRoute? = nil
         var baseOnLevel: UInt? = nil
     }
     
@@ -27,7 +28,7 @@ public struct PresentAction: Action {
         let dismissCount: UInt
         
         /// 目标层，没有的话则是最上层
-        var targetRoute: AnyPresentRoute? = nil
+        var targetRoute: AnyViewRoute? = nil
         var targetLevel: UInt? = nil
     }
     
@@ -36,7 +37,7 @@ public struct PresentAction: Action {
         let isFrozen: Bool
         
         /// 目标层，没有的话则是最上层
-        var targetRoute: AnyPresentRoute? = nil
+        var targetRoute: AnyViewRoute? = nil
         var targetLevel: UInt? = nil
     }
     
@@ -91,7 +92,7 @@ extension PresentAction {
             needCloseButtom: needCloseButtom,
             needFreeze: needFreeze,
             isFullCover: isFullCover,
-            baseOnRoute: PresentRoute<Void>?.none,
+            baseOnRoute: ViewRoute<Void>?.none,
             baseOnLevel: baseOnLevel
         )
     }
@@ -113,7 +114,7 @@ extension PresentAction {
         needCloseButtom: Bool = false,
         needFreeze: Bool = false,
         isFullCover: Bool = false,
-        baseOnRoute: PresentRoute<BaseOnInitData>
+        baseOnRoute: ViewRoute<BaseOnInitData>
     ) -> Self {
         present(
             P.self,
@@ -151,7 +152,7 @@ extension PresentAction {
             needCloseButtom: needCloseButtom,
             needFreeze: needFreeze,
             isFullCover: isFullCover,
-            baseOnRoute: PresentRoute<Void>?.none,
+            baseOnRoute: ViewRoute<Void>?.none,
             baseOnLevel: baseOnLevel
         )
     }
@@ -171,7 +172,7 @@ extension PresentAction {
         needCloseButtom: Bool = false,
         needFreeze: Bool = false,
         isFullCover: Bool = false,
-        baseOnRoute: PresentRoute<BaseOnInitData>
+        baseOnRoute: ViewRoute<BaseOnInitData>
     ) -> Self {
         present(
             P.self,
@@ -192,7 +193,7 @@ extension PresentAction {
         needCloseButtom: Bool = false,
         needFreeze: Bool = false,
         isFullCover: Bool = false,
-        baseOnRoute: PresentRoute<BaseOnInitData>? = nil,
+        baseOnRoute: ViewRoute<BaseOnInitData>? = nil,
         baseOnLevel: UInt? = nil
     ) -> Self {
         var navState: NavigationState? = nil
@@ -227,7 +228,7 @@ extension PresentAction {
     /// - Parameter baseOnLevel: 基于那一层展示界面，这个层级必须小于等于展示流的最顶层层级
     /// - Returns Self: 返回构造好的自己
     public static func present<InitData>(
-        _ route: PresentRoute<InitData>,
+        _ route: ViewRoute<InitData>,
         _ data: InitData,
         navTitle: String? = nil,
         needCloseButtom: Bool = false,
@@ -242,7 +243,7 @@ extension PresentAction {
             needCloseButtom: needCloseButtom,
             needFreeze: needFreeze,
             isFullCover: isFullCover,
-            baseOnRoute: PresentRoute<Void>?.none,
+            baseOnRoute: ViewRoute<Void>?.none,
             baseOnLevel: baseOnLevel
         )
     }
@@ -258,13 +259,13 @@ extension PresentAction {
     /// - Parameter baseOnRoute: 基于那一个路由展示界面，这个路由对应界面必须在展示流中存在
     /// - Returns Self: 返回构造好的自己
     public static func present<InitData, BaseOnInitData>(
-        _ route: PresentRoute<InitData>,
+        _ route: ViewRoute<InitData>,
         _ data: InitData,
         navTitle: String? = nil,
         needCloseButtom: Bool = false,
         needFreeze: Bool = false,
         isFullCover: Bool = false,
-        baseOnRoute: PresentRoute<BaseOnInitData>
+        baseOnRoute: ViewRoute<BaseOnInitData>
     ) -> Self {
         present(
             route,
@@ -288,7 +289,7 @@ extension PresentAction {
     /// - Parameter baseOnLevel: 基于那一层展示界面，这个层级必须小于等于展示流的最顶层层级
     /// - Returns Self: 返回构造好的自己
     public static func present(
-        _ route: PresentRoute<Void>,
+        _ route: ViewRoute<Void>,
         navTitle: String? = nil,
         needCloseButtom: Bool = false,
         needFreeze: Bool = false,
@@ -302,7 +303,7 @@ extension PresentAction {
             needCloseButtom: needCloseButtom,
             needFreeze: needFreeze,
             isFullCover: isFullCover,
-            baseOnRoute: PresentRoute<Void>?.none,
+            baseOnRoute: ViewRoute<Void>?.none,
             baseOnLevel: baseOnLevel
         )
     }
@@ -317,12 +318,12 @@ extension PresentAction {
     /// - Parameter baseOnRoute: 基于那一个路由展示界面，这个路由对应界面必须在展示流中存在
     /// - Returns Self: 返回构造好的自己
     public static func present<BaseOnInitData>(
-        _ route: PresentRoute<Void>,
+        _ route: ViewRoute<Void>,
         navTitle: String? = nil,
         needCloseButtom: Bool = false,
         needFreeze: Bool = false,
         isFullCover: Bool = false,
-        baseOnRoute: PresentRoute<BaseOnInitData>
+        baseOnRoute: ViewRoute<BaseOnInitData>
     ) -> Self {
         present(
             route,
@@ -337,13 +338,13 @@ extension PresentAction {
     
     /// 展示对应路由的界面，内部使用
     static func present<InitData, BaseOnInitData>(
-        _ route: PresentRoute<InitData>,
+        _ route: ViewRoute<InitData>,
         _ data: InitData,
         navTitle: String? = nil,
         needCloseButtom: Bool = false,
         needFreeze: Bool = false,
         isFullCover: Bool = false,
-        baseOnRoute: PresentRoute<BaseOnInitData>? = nil,
+        baseOnRoute: ViewRoute<BaseOnInitData>? = nil,
         baseOnLevel: UInt? = nil
     ) -> Self {
         var navState: NavigationState? = nil
@@ -382,7 +383,7 @@ extension PresentAction {
     ///
     /// - Parameter route: 需要消失界面对应的路由
     /// - Returns Self: 返回构造好的自己
-    public static func dismissViewOnRoute<InitData>(_ route: PresentRoute<InitData>) -> Self {
+    public static func dismissViewOnRoute<InitData>(_ route: ViewRoute<InitData>) -> Self {
         .init(action: .dismiss(.init(dismissCount: 1, targetRoute: route.eraseToAnyRoute())))
     }
     
@@ -398,7 +399,7 @@ extension PresentAction {
     ///
     /// - Parameter route: 需要消失以上界面对应的路由
     /// - Returns Self: 返回构造好的自己
-    public static func dismissToViewOnRoute<InitData>(_ route: PresentRoute<InitData>) -> Self {
+    public static func dismissToViewOnRoute<InitData>(_ route: ViewRoute<InitData>) -> Self {
         .init(action: .dismiss(.init(dismissCount: 0, targetRoute: route.eraseToAnyRoute())))
     }
     
@@ -432,7 +433,7 @@ extension PresentAction {
     ///
     /// - Parameter route: 需要冻结界面对应的路由
     /// - Returns Self: 返回构造好的自己
-    public static func freezeViewOnRoute<InitData>(_ route: PresentRoute<InitData>) -> Self {
+    public static func freezeViewOnRoute<InitData>(_ route: ViewRoute<InitData>) -> Self {
         .init(action: .freeze(.init(isFrozen: true, targetRoute: route.eraseToAnyRoute())))
     }
     
@@ -448,7 +449,7 @@ extension PresentAction {
     ///
     /// - Parameter route: 需要解冻界面对应的路由
     /// - Returns Self: 返回构造好的自己
-    public static func unfreezeViewOnRoute<InitData>(_ route: PresentRoute<InitData>) -> Self {
+    public static func unfreezeViewOnRoute<InitData>(_ route: ViewRoute<InitData>) -> Self {
         .init(action: .freeze(.init(isFrozen: false, targetRoute: route.eraseToAnyRoute())))
     }
     

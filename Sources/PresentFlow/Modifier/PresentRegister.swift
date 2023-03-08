@@ -1,15 +1,16 @@
 //
-//  File.swift
+//  PresentRegister.swift
 //  
 //
 //  Created by 黄磊 on 2022/9/21.
 //
 
 import SwiftUI
+import ViewFlow
 
 extension View {
     /// 注册对应可展示界面
-    public func registerPresentableView<V: PresentableView>(_ presentableViewType: V.Type, for route: PresentRoute<V.InitData>) -> some View {
+    public func registerPresentableView<V: PresentableView>(_ presentableViewType: V.Type, for route: ViewRoute<V.InitData>) -> some View {
         PresentState.presentStore.presentCenter.registePresentableView(presentableViewType, for: route)
         return self
     }

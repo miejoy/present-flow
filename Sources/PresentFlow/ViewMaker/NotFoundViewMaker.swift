@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import ViewFlow
 
 struct NotFoundViewMaker : PresentedViewMaker {
-    var route: AnyPresentRoute
+    var route: AnyViewRoute
     
     func makeView() -> AnyView {
         let notFoundView = VStack {

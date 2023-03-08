@@ -6,6 +6,7 @@
 //
 
 import DataFlow
+import ViewFlow
 import SwiftUI
 
 enum InnerPresentAction: Action {
@@ -23,7 +24,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
     @Environment(\.presentManager) var presentManager
     
     // MARK: - For Presented
-    let route: AnyPresentRoute
+    let route: AnyViewRoute
     let navigationState: NavigationState?
     let viewMaker: PresentedViewMaker
     
@@ -43,7 +44,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
     
     init(
         level: UInt,
-        route: AnyPresentRoute = PresentRoute<Void>().eraseToAnyRoute(),
+        route: AnyViewRoute = ViewRoute<Void>().eraseToAnyRoute(),
         navigationState: NavigationState? = nil,
         viewMaker: PresentedViewMaker = EmptyView()
     ) {

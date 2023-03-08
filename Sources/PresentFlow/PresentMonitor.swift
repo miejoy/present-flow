@@ -7,9 +7,10 @@
 
 import Foundation
 import Combine
+import ViewFlow
 
 public enum TargetRouteNotFound: Equatable, CustomStringConvertible {
-    case route(AnyPresentRoute)
+    case route(AnyViewRoute)
     case level(UInt)
     
     public var description: String {
@@ -24,7 +25,7 @@ public enum TargetRouteNotFound: Equatable, CustomStringConvertible {
 
 /// 存储器变化事件
 public enum PresentEvent {
-    case presentFailed(AnyPresentRoute, TargetRouteNotFound)
+    case presentFailed(AnyViewRoute, TargetRouteNotFound)
     case dismissFailed(TargetRouteNotFound)
     case freezeFailed(TargetRouteNotFound)
     case unfreezeFailed(TargetRouteNotFound)

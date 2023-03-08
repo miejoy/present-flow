@@ -7,6 +7,7 @@
 
 import Foundation
 import DataFlow
+import ViewFlow
 
 enum PresentReducer {
     
@@ -153,7 +154,7 @@ enum PresentReducer {
     }
     
     // MARK: - Get Level
-    static func getTargetLevel(on presentState: PresentState, _ targetRoute: AnyPresentRoute?, _ targetLevel: UInt?, _ notFoundError: inout TargetRouteNotFound?) -> UInt {
+    static func getTargetLevel(on presentState: PresentState, _ targetRoute: AnyViewRoute?, _ targetLevel: UInt?, _ notFoundError: inout TargetRouteNotFound?) -> UInt {
         if let targetLevel = targetLevel {
             if targetLevel > presentState.targetLevel {
                 // 找不到对应 level，所有基于的都以 targetLevel 为主

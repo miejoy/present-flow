@@ -14,9 +14,9 @@ final class PresentCenterTests: XCTestCase {
     func testRouteRegister() throws {
         PresentCenter.shared.registerMap = [:]
         let presentCenter = PresentCenter.shared
-        let route1 = PresentRoute<Void>(routeId: s_defaultPresentRouteId)
-        let route2 = PresentRoute<Void>(routeId: s_defaultPresentRouteId)
-        let route3 = PresentRoute<Void>(routeId: "default")
+        let route1 = ViewRoute<Void>(routeId: s_defaultViewRouteId)
+        let route2 = ViewRoute<Void>(routeId: s_defaultViewRouteId)
+        let route3 = ViewRoute<Void>(routeId: "default")
         
         presentCenter.registerMap[AnyHashable(route1)] = .init(PresentFirstView.self)
         
@@ -48,7 +48,7 @@ final class PresentCenterTests: XCTestCase {
         XCTAssertEqual(presentCenter.registerMap.count, 1)
         XCTAssertNotNil(presentCenter.registerMap[AnyHashable(PresentThirdView.defaultRoute)])
         
-        let secondRoute = PresentRoute<String>(routeId: "second")
+        let secondRoute = ViewRoute<String>(routeId: "second")
         presentCenter.registePresentableView(PresentSecondView.self, for: secondRoute)
         XCTAssertEqual(presentCenter.registerMap.count, 2)
         XCTAssertNotNil(presentCenter.registerMap[AnyHashable(secondRoute)])

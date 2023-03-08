@@ -392,7 +392,7 @@ final class PresentStateTests: XCTestCase {
         
         PresentMonitor.shared.arrObservers = []
         class Oberver: PresentMonitorOberver {
-            var presentRoute: AnyPresentRoute? = nil
+            var presentRoute: AnyViewRoute? = nil
             var presentOnNotFound: TargetRouteNotFound? = nil
             func receivePresentEvent(_ event: PresentEvent) {
                 if case .presentFailed(let presentRoute, let notFound)  = event {
