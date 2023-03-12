@@ -193,7 +193,7 @@ enum PresentReducer {
                         processStore.apply(action: .present(prevIsFullCover))
                         prevIsFullCover = processStore.isFullCover
                         if processLevel == 0 {
-                            break;
+                            break
                         }
                         processLevel -= 1
                     } else {

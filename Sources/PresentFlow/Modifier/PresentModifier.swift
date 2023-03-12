@@ -11,6 +11,8 @@ import SwiftUI
 
 /// 展示修改器
 public struct PresentModifier: ViewModifier {
+    public init() {}
+    
     public func body(content: Content) -> some View {
         PresentFlowView {
             content
