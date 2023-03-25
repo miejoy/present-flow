@@ -12,7 +12,7 @@ import ViewFlow
 extension EnvironmentValues {
     /// 展示管理器
     public var presentManager: Store<PresentState> {
-        get { self[PresentStoreKey.self] }
+        get { self[PresentStoreKey.self] ?? Store<PresentState>.shared(on: self.sceneId) }
         set { self[PresentStoreKey.self] = newValue }
     }
     
@@ -31,8 +31,8 @@ extension EnvironmentValues {
 
 /// 展示存储器对应的 key
 struct PresentStoreKey: EnvironmentKey {
-    static var defaultValue: Store<PresentState> {
-        SceneSharedState<PresentState>().projectedValue
+    static var defaultValue: Store<PresentState>? {
+        return nil
     }
 }
 

@@ -48,16 +48,6 @@ public struct PresentState: FullSceneSharableState {
 
 /// store maker
 extension PresentState {
-    /// 获取 Present Store
-    static var presentStore: Store<PresentState> {
-        /// 环境变量窃取器
-        struct EnvironmentStealer {
-            @Environment(\.presentManager) var presentStore
-        }
-        
-        return EnvironmentStealer().presentStore
-    }
-    
     /// 获取 Inner Present Store
     func innerPresentStoreOnLevel(_ level: UInt, _ createIfNeed: Bool = false) -> Store<InnerPresentState> {
         if level < storage.innerPresentStores.count {

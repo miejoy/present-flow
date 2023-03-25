@@ -7,11 +7,12 @@
 
 import Foundation
 import SwiftUI
+import ViewFlow
 
 struct PresentableViewMaker<P: PresentableView> : PresentedViewMaker {
     var data: P.InitData
     
-    func makeView() -> AnyView {
+    func makeView(on sceneId: SceneId) -> AnyView {
         return AnyView(P(data))
     }
 }

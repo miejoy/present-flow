@@ -6,9 +6,11 @@
 //
 
 import XCTest
+import DataFlow
 import ViewFlow
 import SwiftUI
 @testable import PresentFlow
+import XCTViewFlow
 
 final class PresentCenterTests: XCTestCase {
     func testRouteRegister() throws {
@@ -52,6 +54,42 @@ final class PresentCenterTests: XCTestCase {
         presentCenter.registePresentableView(PresentSecondView.self, for: secondRoute)
         XCTAssertEqual(presentCenter.registerMap.count, 2)
         XCTAssertNotNil(presentCenter.registerMap[AnyHashable(secondRoute)])
+    }
+    
+    func testRegisterOnView() {
+        let sceneId = SceneId.custom("otherScene")
+        
+        let presentStore = Store<PresentState>.shared(on: sceneId)
+        presentStore.presentCenter.registerMap = [:]
+        
+        XCTAssertEqual(presentStore.presentCenter.registerMap.count, 0)
+        
+        let host = ViewTest.host(Color.red.registerPresentableView(PresentFirstView.self, for: PresentFirstView.defaultRoute).environment(\.sceneId, sceneId))
+        
+        XCTAssertEqual(presentStore.presentCenter.registerMap.count, 1)
+        XCTAssertNotNil(presentStore.presentCenter.registerMap[AnyHashable(PresentFirstView.defaultRoute)])
+        
+        ViewTest.releaseHost(host)
+    }
+    
+    func testRegisterWithPresentCenterOnView() {
+        let sceneId = SceneId.custom("otherScene1")
+        
+        let presentStore = Store<PresentState>.shared(on: sceneId)
+        presentStore.presentCenter.registerMap = [:]
+        
+        XCTAssertEqual(presentStore.presentCenter.registerMap.count, 0)
+        
+        let host = ViewTest.host(Color.red.registerPresentOn({ presentCenter in
+            presentCenter.registeDefaultPresentableView(PresentFirstView.self)
+            presentCenter.registeDefaultPresentableView(PresentSecondView.self)
+        }).environment(\.sceneId, sceneId))
+        
+        XCTAssertEqual(presentStore.presentCenter.registerMap.count, 2)
+        XCTAssertNotNil(presentStore.presentCenter.registerMap[AnyHashable(PresentFirstView.defaultRoute)])
+        XCTAssertNotNil(presentStore.presentCenter.registerMap[AnyHashable(PresentSecondView.defaultRoute)])
+        
+        ViewTest.releaseHost(host)
     }
 }
 

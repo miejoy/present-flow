@@ -10,9 +10,16 @@ import SwiftUI
 import ViewFlow
 
 public final class PresentCenter {
+    // 调用 ID，为了解决 SwifUI 中刷新界面时重复调用问题
+    struct CallId: Hashable {
+        let function: String
+        let line: Int
+    }
+    
     public static var shared: PresentCenter = .init()
     
     var registerMap: [AnyHashable: PresentableViewWrapper] = [:]
+    var registerCallSet: Set<CallId> = []
     
     /// 使用默认路由注册对应展示界面
     @inlinable
@@ -29,7 +36,10 @@ public final class PresentCenter {
     }
     
     /// 注册对应展示界面
-    public func registePresentableView<V: PresentableView>(_ presentableViewType: V.Type, for route: ViewRoute<V.InitData>) {
+    public func registePresentableView<V: PresentableView>(
+        _ presentableViewType: V.Type,
+        for route: ViewRoute<V.InitData>
+    ) {
         let key = AnyHashable(route)
         if registerMap[key] != nil {
             PresentMonitor.shared.fatalError("Duplicate registration of PresentableView '\(key)'")
@@ -38,7 +48,10 @@ public final class PresentCenter {
     }
     
     /// 注册对应展示界面
-    public func registePresentableView<V: PresentableView>(_ presentableViewType: V.Type, for route: ViewRoute<V.InitData>) where V.InitData == Void {
+    public func registePresentableView<V: PresentableView>(
+        _ presentableViewType: V.Type,
+        for route: ViewRoute<V.InitData>
+    ) where V.InitData == Void {
         let key = AnyHashable(route)
         if registerMap[key] != nil {
             PresentMonitor.shared.fatalError("Duplicate registration of PresentableView '\(key)'")

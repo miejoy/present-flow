@@ -720,6 +720,7 @@ final class PresentStateTests: XCTestCase {
 
 
 class FakePresentedView {
+    var sceneId: SceneId
     var level: UInt
     var store: Store<PresentState>
     var innerStore: Store<InnerPresentState>
@@ -727,7 +728,8 @@ class FakePresentedView {
     var presentingObserver: AnyCancellable? = nil
     var fullCoverPresentingObserver: AnyCancellable? = nil
     
-    init(level: UInt, store: Store<PresentState>) {
+    init(sceneId: SceneId, level: UInt, store: Store<PresentState>) {
+        self.sceneId = sceneId
         self.level = level
         self.store = store
         self.innerStore = store.state.innerPresentStoreOnLevel(level, level == 0)
@@ -736,7 +738,7 @@ class FakePresentedView {
                 return
             }
             if new {
-                self.presentedView = FakePresentedView(level: self.level + 1, store: self.store)
+                self.presentedView = FakePresentedView(sceneId: self.sceneId, level: self.level + 1, store: self.store)
             } else {
                 if let presentedView = self.presentedView {
                     presentedView.store.apply(action: .didDisappearOnLevel(presentedView.level))
@@ -748,7 +750,7 @@ class FakePresentedView {
                 return
             }
             if new {
-                self.presentedView = FakePresentedView(level: self.level + 1, store: self.store)
+                self.presentedView = FakePresentedView(sceneId: self.sceneId, level: self.level + 1, store: self.store)
             } else {
                 if let presentedView = self.presentedView {
                     presentedView.store.apply(action: .didDisappearOnLevel(presentedView.level))
@@ -757,7 +759,7 @@ class FakePresentedView {
         }
         
         // 这里调用之后，理论上会构造对应 View
-        _ = self.innerStore.state.makeView()
+        _ = self.innerStore.state.makeView(sceneId, AnyView(EmptyView()))
 //        AnyView._makeView(view: view, inputs: view)
     }
 }
@@ -769,7 +771,7 @@ class FakeRootView {
     
     init(store: Store<PresentState>) {
         self.store = store
-        self.presentedView = FakePresentedView(level: 0, store: store)
+        self.presentedView = FakePresentedView(sceneId: .main, level: 0, store: store)
     }
 }
 

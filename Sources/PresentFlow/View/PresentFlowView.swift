@@ -15,7 +15,7 @@ public struct PresentFlowView<Content: View>: View {
     var level: UInt
     
     @ViewBuilder var content: Content
-    @ObservedObject var presetingStore: Store<InnerPresentState>
+    @InnerPresentWrapper var presetingState: InnerPresentState
     
     public init(@ViewBuilder content: () -> Content ) {
         self.init(level: 0, content: content)
@@ -24,17 +24,17 @@ public struct PresentFlowView<Content: View>: View {
     init(level: UInt, @ViewBuilder content: () -> Content) {
         self.level = level
         self.content = content()
-        self.presetingStore = PresentState.presentStore.state.innerPresentStoreOnLevel(level, level == 0)
+        self._presetingState = .init(level)
     }
     
     public var body: some View {
         ZStack {
             content
-                .sheet(isPresented: presetingStore.binding(of: \.isPresenting)) {
+                .sheet(isPresented: $presetingState.binding(of: \.isPresenting)) {
                     PresentedView(level: level + 1)
                 }
                 #if os(iOS) || os(tvOS) || os(watchOS)
-                .fullScreenCover(isPresented: presetingStore.binding(of: \.isFullCoverPresenting)) {
+                .fullScreenCover(isPresented: $presetingState.binding(of: \.isFullCoverPresenting)) {
                     PresentedView(level: level + 1)
                 }
                 #endif

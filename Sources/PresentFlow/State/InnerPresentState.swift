@@ -8,6 +8,7 @@
 import DataFlow
 import ViewFlow
 import SwiftUI
+import Combine
 
 enum InnerPresentAction: Action {
     case present(Bool)
@@ -20,9 +21,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
     typealias BindAction = InnerPresentAction
     
     let level: UInt
-    
-    @Environment(\.presentManager) var presentManager
-    
+        
     // MARK: - For Presented
     let route: AnyViewRoute
     let navigationState: NavigationState?
@@ -34,8 +33,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
     /// 标记当前 view 是不是全屏幕，给上级 state 使用
     var isFullCover = false
     
-    /// 关闭按钮
-    @Environment(\.presentedCloseView) var closeView
+
     
     // MARK: - For Presenting
     /// 是否正在展示其他界面
@@ -54,8 +52,9 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
         self.viewMaker = viewMaker
     }
     
-    func makeView() -> AnyView {
-        var view = viewMaker.makeView()
+    func makeView(_ sceneId: SceneId, _ closeView: AnyView) -> AnyView {
+        let presentStore = Store<PresentState>.shared(on: sceneId)
+        var view = viewMaker.makeView(on: sceneId)
         if let navigationState = navigationState {
             if let navigationTitle = navigationState.navigationTitle {
                 let viewWithTitle = view.navigationTitle(navigationTitle)
@@ -73,7 +72,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
             #if os(iOS) || os(tvOS)
             if navigationState.needCloseButtom {
                 view = AnyView(view.navigationBarItems(leading: Button(action: {
-                    presentManager.dismiss()
+                    presentStore.dismissViewOnLevel(level)
                 }, label: {
                     closeView
                 })))
@@ -102,6 +101,60 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
     }
 }
 
+@propertyWrapper
+struct InnerPresentWrapper : DynamicProperty {
+    
+    @ObservedObject
+    var storage: InnerPresentWrapperStorage
+    @Environment(\.sceneId)
+    var sceneId
+    
+    init(_ level: UInt) {
+        self._storage = .init(wrappedValue: .init(level: level))
+    }
+    
+    var wrappedValue: InnerPresentState {
+        get {
+            storage.store!.state
+        }
+        
+        nonmutating set {
+            storage.store!.state = newValue
+        }
+    }
+    
+    var projectedValue: Store<InnerPresentState> {
+        storage.store!
+    }
+    
+    func update() {
+        if storage.store == nil {
+            storage.configIfNeed(sceneId)
+        }
+    }
+}
+
+final class InnerPresentWrapperStorage: ObservableObject {
+    let level: UInt
+    @Published
+    var refreshTrigger: Bool = false
+    var store: Store<InnerPresentState>? = nil
+    var cancellable: AnyCancellable? = nil
+    
+    init(level: UInt) {
+        self.level = level
+    }
+    
+    func configIfNeed(_ sceneId: SceneId) {
+        if store == nil {
+            let newStore = Store<PresentState>.shared(on: sceneId).state.innerPresentStoreOnLevel(level, level == 0)
+            self.cancellable = newStore.addObserver { [weak self] new, old in
+                self?.refreshTrigger.toggle()
+            }
+            self.store = newStore
+        }
+    }
+}
 
 struct NavigationState {
     var navigationTitle: String? = nil

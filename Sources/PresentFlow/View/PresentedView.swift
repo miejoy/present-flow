@@ -14,19 +14,23 @@ struct PresentedView: TrackableView {
     
     let level: UInt
     @Environment(\.presentManager) var presentManager
+
+    @Environment(\.sceneId) var sceneId
+    /// 关闭按钮
+    @Environment(\.presentedCloseView) var closeView
     
-    @ObservedObject var presetedStore: Store<InnerPresentState>
+    @InnerPresentWrapper var presetedState: InnerPresentState
     
     init(level: UInt) {
         self.level = level
-        self.presetedStore = PresentState.presentStore.state.innerPresentStoreOnLevel(level)
+        self._presetedState = .init(level)
     }
     
     var content: some View {
         PresentFlowView(level: level) {
-            presetedStore.state.makeView()
+            presetedState.makeView(sceneId, closeView)
         }
-        .interactiveDismissDisabled(presetedStore.isFrozen)
+        .interactiveDismissDisabled(presetedState.isFrozen)
         .onDisappear {
             // 这里需要确保是异步的
             presentManager.apply(action: .didDisappearOnLevel(level))
