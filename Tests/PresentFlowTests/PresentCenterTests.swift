@@ -91,5 +91,55 @@ final class PresentCenterTests: XCTestCase {
         
         ViewTest.releaseHost(host)
     }
+    
+    func testRegisterPresentedModifier() {
+        let sceneId = SceneId.custom("otherScene1")
+        
+        var callbackSceneId: SceneId? = nil
+        var callbackLevel: UInt? = nil
+        
+        let view = PresentedModifiterTestView {
+            callbackSceneId = $0
+            callbackLevel = $1
+        }
+        
+        let host = ViewTest.host(view.environment(\.sceneId, sceneId))
+        
+        ViewTest.refreshHost(host)
+        
+        XCTAssertEqual(callbackSceneId, sceneId)
+        XCTAssertEqual(callbackLevel, 1)
+        
+        ViewTest.releaseHost(host)
+    }
 }
 
+
+
+struct PresentedModifiterTestView: View {
+    
+    let callback: (_ sceneId: SceneId, _ level: UInt) -> Void
+    
+    var body: some View {
+        PresentFlowView {
+            PresentTextView()
+        }
+        .registerPresentedModifier { content, sceneId, level in
+            callback(sceneId, level)
+            return content
+        }
+        .registerPresentableView(PresentFirstView.self)
+    }
+}
+
+struct PresentTextView: View {
+    
+    @Environment(\.presentManager) var presentManager
+    
+    var body: some View {
+        Text("text")
+            .onAppear {
+                presentManager.present(PresentFirstView.self)
+            }
+    }
+}

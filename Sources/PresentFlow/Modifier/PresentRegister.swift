@@ -10,6 +10,12 @@ import DataFlow
 import ViewFlow
 
 extension View {
+    
+    /// 注册对应可展示界面
+    public func registerPresentableView<V: PresentableView>(_ presentableViewType: V.Type, function: String = #function, line: Int = #line) -> some View {
+        return registerPresentableView(presentableViewType, for: V.defaultRoute, function: function, line: line)
+    }
+    
     /// 注册对应可展示界面
     public func registerPresentableView<V: PresentableView>(_ presentableViewType: V.Type, for route: ViewRoute<V.InitData>, function: String = #function, line: Int = #line) -> some View {
         return self.modifier(PresentRegisterModifier(callback: { sceneId in
@@ -34,18 +40,45 @@ extension View {
             }
         }))
     }
+    
+    /// 注册展示后界面对应修饰回调（主要解决部分修饰无法应用到被展示界面的问题）
+    public func registerPresentedModifier(
+        _ callback: @escaping (_ content: AnyView, _ sceneId: SceneId, _ level: UInt) -> AnyView,
+        function: String = #function,
+        line: Int = #line
+    ) -> some View {
+        return self.modifier(PresentRegisterModifier(callback: { sceneId in
+            let presentStore = Store<PresentState>.shared(on: sceneId)
+            let callId = PresentCenter.CallId(function: function, line: line)
+            if !presentStore.presentCenter.registerCallSet.contains(callId) {
+                presentStore.presentCenter.presentedModifier = callback
+                presentStore.presentCenter.registerCallSet.insert(callId)
+            }
+        }))
+    }
 }
 
 /// 展示修改器
-public struct PresentRegisterModifier: ViewModifier {
+struct PresentRegisterModifier: ViewModifier {
     
     var callback: (SceneId) -> Void
     @Environment(\.sceneId) var sceneId
     
-    public func body(content: Content) -> some View {
+    func body(content: Content) -> some View {
         return content.onAppear {
             callback(sceneId)
         }
     }
 }
 
+struct PresentedModifier: ViewModifier {
+    
+    @Environment(\.sceneId) var sceneId
+    @Environment(\.presentLevel) var level
+    let callback: ((_ content: AnyView, _ sceneId: SceneId, _ level: UInt) -> AnyView)?
+    
+    func body(content: Content) -> AnyView {
+        let view = AnyView(content)
+        return callback?(view, sceneId, level) ?? view
+    }
+}

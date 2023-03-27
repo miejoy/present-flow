@@ -20,6 +20,7 @@ public final class PresentCenter {
     
     var registerMap: [AnyHashable: PresentableViewWrapper] = [:]
     var registerCallSet: Set<CallId> = []
+    var presentedModifier: ((_ content: AnyView, _ sceneId: SceneId, _ level: UInt) -> AnyView)? = nil
     
     /// 使用默认路由注册对应展示界面
     @inlinable

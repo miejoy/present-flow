@@ -30,6 +30,9 @@ struct PresentedView: TrackableView {
         PresentFlowView(level: level) {
             presetedState.makeView(sceneId, closeView)
         }
+        .modifier(PresentedModifier(
+            callback: presentManager.presentCenter.presentedModifier ?? PresentCenter.shared.presentedModifier)
+        )
         .interactiveDismissDisabled(presetedState.isFrozen)
         .onDisappear {
             // 这里需要确保是异步的
