@@ -124,7 +124,7 @@ struct PresentedModifiterTestView: View {
         PresentFlowView {
             PresentTextView()
         }
-        .registerPresentedModifier { content, sceneId, level in
+        .registerPresentedModifier { (content, sceneId, level) -> AnyView in
             callback(sceneId, level)
             return content
         }

@@ -32,9 +32,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
     
     /// 标记当前 view 是不是全屏幕，给上级 state 使用
     var isFullCover = false
-    
-
-    
+        
     // MARK: - For Presenting
     /// 是否正在展示其他界面
     var isPresenting: Bool = false

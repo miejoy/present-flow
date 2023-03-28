@@ -42,8 +42,8 @@ extension View {
     }
     
     /// 注册展示后界面对应修饰回调（主要解决部分修饰无法应用到被展示界面的问题）
-    public func registerPresentedModifier(
-        _ callback: @escaping (_ content: AnyView, _ sceneId: SceneId, _ level: UInt) -> AnyView,
+    public func registerPresentedModifier<V: View>(
+        _ callback: @escaping (_ content: AnyView, _ sceneId: SceneId, _ level: UInt) -> V,
         function: String = #function,
         line: Int = #line
     ) -> some View {
@@ -51,7 +51,7 @@ extension View {
             let presentStore = Store<PresentState>.shared(on: sceneId)
             let callId = PresentCenter.CallId(function: function, line: line)
             if !presentStore.presentCenter.registerCallSet.contains(callId) {
-                presentStore.presentCenter.presentedModifier = callback
+                presentStore.presentCenter.presentedModifier = { AnyView(callback(AnyView($0), $1, $2)) }
                 presentStore.presentCenter.registerCallSet.insert(callId)
             }
         }))
@@ -75,10 +75,9 @@ struct PresentedModifier: ViewModifier {
     
     @Environment(\.sceneId) var sceneId
     @Environment(\.presentLevel) var level
-    let callback: ((_ content: AnyView, _ sceneId: SceneId, _ level: UInt) -> AnyView)?
+    let callback: ((_ content: Content, _ sceneId: SceneId, _ level: UInt) -> AnyView)?
     
     func body(content: Content) -> AnyView {
-        let view = AnyView(content)
-        return callback?(view, sceneId, level) ?? view
+        return callback?(content, sceneId, level) ?? AnyView(content)
     }
 }
