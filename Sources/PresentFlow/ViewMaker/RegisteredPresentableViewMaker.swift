@@ -30,6 +30,6 @@ struct RegisteredPresentableViewMaker: PresentedViewMaker {
         }
         // 这里需要记录异常
         PresentMonitor.shared.fatalError("No registed presentable view for route '\(routeData.route)'")
-        return NotFoundViewMaker(route: routeData.route).makeView(on: sceneId)
+        return PresentNotFoundViewMaker(route: routeData.route).makeView(on: sceneId)
     }
 }

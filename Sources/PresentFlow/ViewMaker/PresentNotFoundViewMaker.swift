@@ -1,5 +1,5 @@
 //
-//  NotFoundViewMaker.swift
+//  PresentNotFoundViewMaker.swift
 //  DemoApp
 //
 //  Created by 黄磊 on 2022/9/22.
@@ -9,7 +9,7 @@ import SwiftUI
 import DataFlow
 import ViewFlow
 
-public struct NotFoundViewMaker : PresentedViewMaker {
+public struct PresentNotFoundViewMaker : PresentedViewMaker {
     let route: AnyViewRoute
     
     public init(route: AnyViewRoute) {
