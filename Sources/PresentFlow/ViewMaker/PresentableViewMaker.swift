@@ -10,7 +10,7 @@ import SwiftUI
 import ViewFlow
 
 struct PresentableViewMaker<P: PresentableView> : PresentedViewMaker {
-    var data: P.InitData
+    let data: P.InitData
     
     func makeView(on sceneId: SceneId) -> AnyView {
         return AnyView(P(data))

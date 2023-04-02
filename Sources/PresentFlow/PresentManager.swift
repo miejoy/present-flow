@@ -45,6 +45,14 @@ extension Store where State == PresentState {
         self.send(action: .present(route))
     }
     
+    /// 展示对应路由的界面，使用路由操作前，必须确保对应路由已使用 PresentCenter 注册
+    ///
+    /// - Parameter route: 需要展示界面的路由
+    @inlinable
+    public func present(_ routeData: ViewRouteData) {
+        self.send(action: .present(routeData))
+    }
+    
     /// 消失最顶层界面
     @inlinable
     public func dismiss() {

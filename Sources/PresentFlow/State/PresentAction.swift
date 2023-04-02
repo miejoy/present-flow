@@ -347,12 +347,83 @@ extension PresentAction {
         baseOnRoute: ViewRoute<BaseOnInitData>? = nil,
         baseOnLevel: UInt? = nil
     ) -> Self {
+        return .present(route.wrapper(data), navTitle: navTitle, needCloseButtom: needCloseButtom, needFreeze: needFreeze, isFullCover: isFullCover, baseOnRoute: baseOnRoute, baseOnLevel: baseOnLevel)
+    }
+    
+    // MARK: -Present With RouteData
+    
+    /// 展示对应 route 的界面
+    ///
+    /// - Parameter route: 需要展示界面对应的路由
+    /// - Parameter data: 初始化展示界面需要的数据
+    /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
+    /// - Parameter needCloseButtom: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
+    /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter baseOnLevel: 基于那一层展示界面，这个层级必须小于等于展示流的最顶层层级
+    /// - Returns Self: 返回构造好的自己
+    public static func present(
+        _ routeData: ViewRouteData,
+        navTitle: String? = nil,
+        needCloseButtom: Bool = false,
+        needFreeze: Bool = false,
+        isFullCover: Bool = false,
+        baseOnLevel: UInt? = nil
+    ) -> Self {
+        present(routeData,
+            navTitle: navTitle,
+            needCloseButtom: needCloseButtom,
+            needFreeze: needFreeze,
+            isFullCover: isFullCover,
+            baseOnRoute: ViewRoute<Void>?.none,
+            baseOnLevel: baseOnLevel
+        )
+    }
+    
+    /// 基于 baseOnRoute 展示对应 route 的界面
+    ///
+    /// - Parameter route: 需要展示界面对应的路由
+    /// - Parameter data: 初始化展示界面需要的数据
+    /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
+    /// - Parameter needCloseButtom: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
+    /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter baseOnRoute: 基于那一个路由展示界面，这个路由对应界面必须在展示流中存在
+    /// - Returns Self: 返回构造好的自己
+    public static func present<BaseOnInitData>(
+        _ routeData: ViewRouteData,
+        navTitle: String? = nil,
+        needCloseButtom: Bool = false,
+        needFreeze: Bool = false,
+        isFullCover: Bool = false,
+        baseOnRoute: ViewRoute<BaseOnInitData>
+    ) -> Self {
+        present(routeData,
+            navTitle: navTitle,
+            needCloseButtom: needCloseButtom,
+            needFreeze: needFreeze,
+            isFullCover: isFullCover,
+            baseOnRoute: baseOnRoute,
+            baseOnLevel: nil
+        )
+    }
+    
+    /// 展示对应路由的界面，内部使用
+    static func present<BaseOnInitData>(
+        _ routeData: ViewRouteData,
+        navTitle: String? = nil,
+        needCloseButtom: Bool = false,
+        needFreeze: Bool = false,
+        isFullCover: Bool = false,
+        baseOnRoute: ViewRoute<BaseOnInitData>? = nil,
+        baseOnLevel: UInt? = nil
+    ) -> Self {
         var navState: NavigationState? = nil
         if navTitle != nil || needCloseButtom {
             navState = .init(navigationTitle: navTitle, needCloseButtom: needCloseButtom)
         }
-        let viewMaker = RegisteredPresentableViewMaker(route: route, data: data)
-        var presentAction = InnerPresentAction(route: route.eraseToAnyRoute(), viewMaker: viewMaker, navigationState: navState, isFrozen: needFreeze)
+        let viewMaker = RegisteredPresentableViewMaker(routeData: routeData)
+        var presentAction = InnerPresentAction(route: routeData.route, viewMaker: viewMaker, navigationState: navState, isFrozen: needFreeze)
         if let baseOnRoute = baseOnRoute {
             presentAction.baseOnRoute = baseOnRoute.eraseToAnyRoute()
         } else if let baseOnLevel = baseOnLevel {

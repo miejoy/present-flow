@@ -112,8 +112,74 @@ final class PresentCenterTests: XCTestCase {
         
         ViewTest.releaseHost(host)
     }
+    
+    func testRegisterExternalViewMaker() {
+        
+        PresentCenter.shared.externalViewMaker = nil
+        let sceneId = SceneId.custom("otherScene2")
+        
+        let route = ViewRoute<Int>(routeId: "EmptyView")
+        let data: Int = 1
+        var callRouteData: ViewRouteData? = nil
+        
+        PresentCenter.shared.registerExternalViewMaker { routeData, sceneId in
+            callRouteData = routeData
+            return AnyView(EmptyView())
+        }
+        
+        XCTAssertNotNil(PresentCenter.shared.externalViewMaker)
+        
+        let view = Text("test")
+            .modifier(PresentModifier())
+            .onAppear {
+                Store<PresentState>.shared(on: sceneId).present(route.wrapper(data))
+            }
+            .environment(\.sceneId, sceneId)
+        
+        let host = ViewTest.host(view)
+        
+        XCTAssertNil(callRouteData)
+        
+        // 这里才会真正展示新界面
+        ViewTest.refreshHost(host)
+        
+        XCTAssertEqual(callRouteData?.route, route.eraseToAnyRoute())
+        XCTAssertEqual(callRouteData?.initData as? Int, data)
+        
+        PresentCenter.shared.externalViewMaker = nil
+    }
+    
+    func testRegisterExternalViewMakerOnScene() {
+        let sceneId = SceneId.custom("otherScene3")
+        
+        let route = ViewRoute<Int>(routeId: "EmptyView")
+        let data: Int = 1
+        var callRouteData: ViewRouteData? = nil
+        
+        let view = Text("test")
+            .modifier(PresentModifier())
+            .onAppear {
+                Store<PresentState>.shared(on: sceneId).present(route.wrapper(data))
+            }
+            .registerPresentOn { presentCenter in
+                presentCenter.registerExternalViewMaker { routeData, sceneId in
+                    callRouteData = routeData
+                    return AnyView(EmptyView())
+                }
+            }
+            .environment(\.sceneId, sceneId)
+        
+        let host = ViewTest.host(view)
+        
+        XCTAssertNil(callRouteData)
+        
+        // 这里才会真正展示新界面
+        ViewTest.refreshHost(host)
+        
+        XCTAssertEqual(callRouteData?.route, route.eraseToAnyRoute())
+        XCTAssertEqual(callRouteData?.initData as? Int, data)
+    }
 }
-
 
 
 struct PresentedModifiterTestView: View {

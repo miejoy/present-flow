@@ -21,6 +21,7 @@ public final class PresentCenter {
     var registerMap: [AnyHashable: PresentableViewWrapper] = [:]
     var registerCallSet: Set<CallId> = []
     var presentedModifier: ((_ content: PresentedModifier.Content, _ sceneId: SceneId, _ level: UInt) -> AnyView)? = nil
+    var externalViewMaker: ((_ routeData: ViewRouteData, _ sceneId: SceneId) -> AnyView)? = nil
     
     /// 使用默认路由注册对应展示界面
     @inlinable
@@ -58,6 +59,13 @@ public final class PresentCenter {
             PresentMonitor.shared.fatalError("Duplicate registration of PresentableView '\(key)'")
         }
         registerMap[key] = .init(V.self)
+    }
+    
+    public func registerExternalViewMaker(_ viewMaker: @escaping (_ routeData: ViewRouteData, _ sceneId: SceneId) -> AnyView) {
+        if externalViewMaker != nil {
+            PresentMonitor.shared.fatalError("Duplicate registration of External View Maker")
+        }
+        externalViewMaker = viewMaker
     }
 }
 

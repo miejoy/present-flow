@@ -9,20 +9,27 @@ import SwiftUI
 import DataFlow
 import ViewFlow
 
-struct RegisteredPresentableViewMaker<InitData> : PresentedViewMaker {
-    var route: ViewRoute<InitData>
-    var data: InitData
+struct RegisteredPresentableViewMaker: PresentedViewMaker {
+
+    let routeData: ViewRouteData
     
     func makeView(on sceneId: SceneId) -> AnyView {
         let presentCenter = Store<PresentState>.shared(on: sceneId).presentCenter
-        if let wrapper = presentCenter.registerMap[AnyHashable(route)] {
-            return wrapper.makeView(data)
+        // 先查找外部界面构造器
+        if let viewMaker = presentCenter.externalViewMaker {
+            return viewMaker(routeData, sceneId)
         }
-        if let wrapper = PresentCenter.shared.registerMap[AnyHashable(route)] {
-            return wrapper.makeView(data)
+        if let viewMaker = PresentCenter.shared.externalViewMaker {
+            return viewMaker(routeData, sceneId)
+        }
+        if let wrapper = presentCenter.registerMap[routeData.route.hashValue] {
+            return wrapper.makeView(routeData.initData)
+        }
+        if let wrapper = PresentCenter.shared.registerMap[routeData.route.hashValue] {
+            return wrapper.makeView(routeData.initData)
         }
         // 这里需要记录异常
-        PresentMonitor.shared.fatalError("No registed presentable view for route '\(route)'")
-        return NotFoundViewMaker(route: route.eraseToAnyRoute()).makeView(on: sceneId)
+        PresentMonitor.shared.fatalError("No registed presentable view for route '\(routeData.route)'")
+        return NotFoundViewMaker(route: routeData.route).makeView(on: sceneId)
     }
 }

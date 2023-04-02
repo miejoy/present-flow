@@ -9,10 +9,14 @@ import SwiftUI
 import DataFlow
 import ViewFlow
 
-struct NotFoundViewMaker : PresentedViewMaker {
-    var route: AnyViewRoute
+public struct NotFoundViewMaker : PresentedViewMaker {
+    let route: AnyViewRoute
     
-    func makeView(on sceneId: SceneId) -> AnyView {        
+    public init(route: AnyViewRoute) {
+        self.route = route
+    }
+    
+    public func makeView(on sceneId: SceneId) -> AnyView {        
         let notFoundView = VStack {
             Text("Present view not found with route '\(route.description)'")
             Button("Dismiss") {
