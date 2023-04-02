@@ -22,10 +22,10 @@ struct RegisteredPresentableViewMaker: PresentedViewMaker {
         if let viewMaker = PresentCenter.shared.externalViewMaker {
             return viewMaker(routeData, sceneId)
         }
-        if let wrapper = presentCenter.registerMap[routeData.route.hashValue] {
+        if let wrapper = presentCenter.registerMap[routeData.route] {
             return wrapper.makeView(routeData.initData)
         }
-        if let wrapper = PresentCenter.shared.registerMap[routeData.route.hashValue] {
+        if let wrapper = PresentCenter.shared.registerMap[routeData.route] {
             return wrapper.makeView(routeData.initData)
         }
         // 这里需要记录异常

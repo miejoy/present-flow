@@ -18,7 +18,7 @@ public final class PresentCenter {
     
     public static var shared: PresentCenter = .init()
     
-    var registerMap: [AnyHashable: PresentableViewWrapper] = [:]
+    var registerMap: [AnyViewRoute: PresentableViewWrapper] = [:]
     var registerCallSet: Set<CallId> = []
     var presentedModifier: ((_ content: PresentedModifier.Content, _ sceneId: SceneId, _ level: UInt) -> AnyView)? = nil
     var externalViewMaker: ((_ routeData: ViewRouteData, _ sceneId: SceneId) -> AnyView)? = nil
@@ -42,7 +42,7 @@ public final class PresentCenter {
         _ presentableViewType: V.Type,
         for route: ViewRoute<V.InitData>
     ) {
-        let key = AnyHashable(route)
+        let key = route.eraseToAnyRoute()
         if registerMap[key] != nil {
             PresentMonitor.shared.fatalError("Duplicate registration of PresentableView '\(key)'")
         }
@@ -54,7 +54,7 @@ public final class PresentCenter {
         _ presentableViewType: V.Type,
         for route: ViewRoute<V.InitData>
     ) where V.InitData == Void {
-        let key = AnyHashable(route)
+        let key = route.eraseToAnyRoute()
         if registerMap[key] != nil {
             PresentMonitor.shared.fatalError("Duplicate registration of PresentableView '\(key)'")
         }

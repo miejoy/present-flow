@@ -20,12 +20,12 @@ final class PresentCenterTests: XCTestCase {
         let route2 = ViewRoute<Void>(routeId: s_defaultViewRouteId)
         let route3 = ViewRoute<Void>(routeId: "default")
         
-        presentCenter.registerMap[AnyHashable(route1)] = .init(PresentFirstView.self)
+        presentCenter.registerMap[route1.eraseToAnyRoute()] = .init(PresentFirstView.self)
         
-        let maker2 = presentCenter.registerMap[AnyHashable(route2)]
+        let maker2 = presentCenter.registerMap[route2.eraseToAnyRoute()]
         XCTAssertNotNil(maker2)
         
-        let maker3 = presentCenter.registerMap[AnyHashable(route3)]
+        let maker3 = presentCenter.registerMap[route3.eraseToAnyRoute()]
         XCTAssertNil(maker3)
     }
     
@@ -35,11 +35,11 @@ final class PresentCenterTests: XCTestCase {
         
         presentCenter.registeDefaultPresentableView(PresentFirstView.self)
         XCTAssertEqual(presentCenter.registerMap.count, 1)
-        XCTAssertNotNil(presentCenter.registerMap[AnyHashable(PresentFirstView.defaultRoute)])
+        XCTAssertNotNil(presentCenter.registerMap[PresentFirstView.defaultRoute.eraseToAnyRoute()])
         
         presentCenter.registeDefaultPresentableView(PresentSecondView.self)
         XCTAssertEqual(presentCenter.registerMap.count, 2)
-        XCTAssertNotNil(presentCenter.registerMap[AnyHashable(PresentSecondView.defaultRoute)])
+        XCTAssertNotNil(presentCenter.registerMap[PresentSecondView.defaultRoute.eraseToAnyRoute()])
     }
     
     func testRegisterWithRoute() {
@@ -48,12 +48,12 @@ final class PresentCenterTests: XCTestCase {
         
         presentCenter.registePresentableView(PresentFirstView.self, for: PresentThirdView.defaultRoute)
         XCTAssertEqual(presentCenter.registerMap.count, 1)
-        XCTAssertNotNil(presentCenter.registerMap[AnyHashable(PresentThirdView.defaultRoute)])
+        XCTAssertNotNil(presentCenter.registerMap[PresentThirdView.defaultRoute.eraseToAnyRoute()])
         
         let secondRoute = ViewRoute<String>(routeId: "second")
         presentCenter.registePresentableView(PresentSecondView.self, for: secondRoute)
         XCTAssertEqual(presentCenter.registerMap.count, 2)
-        XCTAssertNotNil(presentCenter.registerMap[AnyHashable(secondRoute)])
+        XCTAssertNotNil(presentCenter.registerMap[secondRoute.eraseToAnyRoute()])
     }
     
     func testRegisterOnView() {
@@ -67,7 +67,7 @@ final class PresentCenterTests: XCTestCase {
         let host = ViewTest.host(Color.red.registerPresentableView(PresentFirstView.self, for: PresentFirstView.defaultRoute).environment(\.sceneId, sceneId))
         
         XCTAssertEqual(presentStore.presentCenter.registerMap.count, 1)
-        XCTAssertNotNil(presentStore.presentCenter.registerMap[AnyHashable(PresentFirstView.defaultRoute)])
+        XCTAssertNotNil(presentStore.presentCenter.registerMap[PresentFirstView.defaultRoute.eraseToAnyRoute()])
         
         ViewTest.releaseHost(host)
     }
@@ -86,8 +86,8 @@ final class PresentCenterTests: XCTestCase {
         }).environment(\.sceneId, sceneId))
         
         XCTAssertEqual(presentStore.presentCenter.registerMap.count, 2)
-        XCTAssertNotNil(presentStore.presentCenter.registerMap[AnyHashable(PresentFirstView.defaultRoute)])
-        XCTAssertNotNil(presentStore.presentCenter.registerMap[AnyHashable(PresentSecondView.defaultRoute)])
+        XCTAssertNotNil(presentStore.presentCenter.registerMap[PresentFirstView.defaultRoute.eraseToAnyRoute()])
+        XCTAssertNotNil(presentStore.presentCenter.registerMap[PresentSecondView.defaultRoute.eraseToAnyRoute()])
         
         ViewTest.releaseHost(host)
     }
