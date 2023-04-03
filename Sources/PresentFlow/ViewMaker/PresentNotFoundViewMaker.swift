@@ -16,6 +16,15 @@ public struct PresentNotFoundViewMaker : PresentedViewMaker {
         self.route = route
     }
     
+    // 正式环境不弹出界面
+    func canMakeView(on sceneId: SceneId) -> Bool {
+        #if DEBUG
+        return true
+        #else
+        return false
+        #endif
+    }
+    
     public func makeView(on sceneId: SceneId) -> AnyView {        
         let notFoundView = VStack {
             Text("Present view not found with route '\(route.description)'")

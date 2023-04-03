@@ -26,6 +26,7 @@ public enum TargetRouteNotFound: Equatable, CustomStringConvertible {
 /// 存储器变化事件
 public enum PresentEvent {
     case presentFailed(AnyViewRoute, TargetRouteNotFound)
+    case presentFailedNotRegister(AnyViewRoute)
     case dismissFailed(TargetRouteNotFound)
     case freezeFailed(TargetRouteNotFound)
     case unfreezeFailed(TargetRouteNotFound)

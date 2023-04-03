@@ -11,6 +11,7 @@ import ViewFlow
 import Combine
 import SwiftUI
 @testable import PresentFlow
+import XCTViewFlow
 
 import Foundation
 
@@ -20,6 +21,35 @@ final class PresentStateTests: XCTestCase {
         PresentCenter.shared.registerMap = [:]
         PresentCenter.shared.registeDefaultPresentableView(PresentThirdView.self)
         PresentCenter.shared.registePresentableView(PresentFourthView.self, for: PresentFourthView.defaultRoute)
+    }
+    
+    func testSaveSceneId() {
+        let sceneId = SceneId.custom("SaveScene")
+        
+        var presentStore: Store<PresentState>? = nil
+                
+        struct NormalView: View {
+            @Environment(\.presentManager) var presentManager
+            var callback: (Store<PresentState>) -> Void
+            
+            var body: some View {
+                callback(presentManager)
+                return Text("test")
+            }
+        }
+        
+        let view = NormalView {
+            presentStore = $0
+        }
+            .modifier(PresentModifier())
+            .environment(\.sceneId, sceneId)
+        
+        let host = ViewTest.host(view)
+        
+        XCTAssertNotNil(presentStore)
+        XCTAssertEqual(presentStore?.sceneId, sceneId)
+        
+        ViewTest.releaseHost(host)
     }
     
     func testPresent() throws {

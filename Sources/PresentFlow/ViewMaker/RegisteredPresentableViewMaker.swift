@@ -13,6 +13,15 @@ struct RegisteredPresentableViewMaker: PresentedViewMaker {
 
     let routeData: ViewRouteData
     
+    // 正式环境不弹出界面
+    func canMakeView(on sceneId: SceneId) -> Bool {
+        #if DEBUG
+        return true
+        #else
+        return false
+        #endif
+    }
+    
     func makeView(on sceneId: SceneId) -> AnyView {
         let presentCenter = Store<PresentState>.shared(on: sceneId).presentCenter
         // 先查找外部界面构造器
