@@ -33,11 +33,11 @@ final class PresentCenterTests: XCTestCase {
         PresentCenter.shared.registerMap = [:]
         let presentCenter = PresentCenter.shared
         
-        presentCenter.registeDefaultPresentableView(PresentFirstView.self)
+        presentCenter.registerDefaultPresentableView(PresentFirstView.self)
         XCTAssertEqual(presentCenter.registerMap.count, 1)
         XCTAssertNotNil(presentCenter.registerMap[PresentFirstView.defaultRoute.eraseToAnyRoute()])
         
-        presentCenter.registeDefaultPresentableView(PresentSecondView.self)
+        presentCenter.registerDefaultPresentableView(PresentSecondView.self)
         XCTAssertEqual(presentCenter.registerMap.count, 2)
         XCTAssertNotNil(presentCenter.registerMap[PresentSecondView.defaultRoute.eraseToAnyRoute()])
     }
@@ -46,12 +46,12 @@ final class PresentCenterTests: XCTestCase {
         PresentCenter.shared.registerMap = [:]
         let presentCenter = PresentCenter.shared
         
-        presentCenter.registePresentableView(PresentFirstView.self, for: PresentThirdView.defaultRoute)
+        presentCenter.registerPresentableView(PresentFirstView.self, for: PresentThirdView.defaultRoute)
         XCTAssertEqual(presentCenter.registerMap.count, 1)
         XCTAssertNotNil(presentCenter.registerMap[PresentThirdView.defaultRoute.eraseToAnyRoute()])
         
         let secondRoute = ViewRoute<String>(routeId: "second")
-        presentCenter.registePresentableView(PresentSecondView.self, for: secondRoute)
+        presentCenter.registerPresentableView(PresentSecondView.self, for: secondRoute)
         XCTAssertEqual(presentCenter.registerMap.count, 2)
         XCTAssertNotNil(presentCenter.registerMap[secondRoute.eraseToAnyRoute()])
     }
@@ -81,8 +81,8 @@ final class PresentCenterTests: XCTestCase {
         XCTAssertEqual(presentStore.presentCenter.registerMap.count, 0)
         
         let host = ViewTest.host(Color.red.registerPresentOn({ presentCenter in
-            presentCenter.registeDefaultPresentableView(PresentFirstView.self)
-            presentCenter.registeDefaultPresentableView(PresentSecondView.self)
+            presentCenter.registerDefaultPresentableView(PresentFirstView.self)
+            presentCenter.registerDefaultPresentableView(PresentSecondView.self)
         }).environment(\.sceneId, sceneId))
         
         XCTAssertEqual(presentStore.presentCenter.registerMap.count, 2)

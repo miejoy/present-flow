@@ -22,7 +22,7 @@ extension View {
             let presentStore = Store<PresentState>.shared(on: sceneId)
             let callId = PresentCenter.CallId(function: function, line: line)
             if !presentStore.presentCenter.registerCallSet.contains(callId) {
-                presentStore.presentCenter.registePresentableView(presentableViewType, for: route)
+                presentStore.presentCenter.registerPresentableView(presentableViewType, for: route)
                 presentStore.presentCenter.registerCallSet.insert(callId)
             }
         }))

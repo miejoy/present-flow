@@ -19,8 +19,8 @@ final class PresentStateTests: XCTestCase {
     
     override class func setUp() {
         PresentCenter.shared.registerMap = [:]
-        PresentCenter.shared.registeDefaultPresentableView(PresentThirdView.self)
-        PresentCenter.shared.registePresentableView(PresentFourthView.self, for: PresentFourthView.defaultRoute)
+        PresentCenter.shared.registerDefaultPresentableView(PresentThirdView.self)
+        PresentCenter.shared.registerPresentableView(PresentFourthView.self, for: PresentFourthView.defaultRoute)
     }
     
     func testSaveSceneId() {

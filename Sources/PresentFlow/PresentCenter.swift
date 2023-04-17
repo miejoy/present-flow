@@ -25,20 +25,20 @@ public final class PresentCenter {
     
     /// 使用默认路由注册对应展示界面
     @inlinable
-    public func registeDefaultPresentableView<V: PresentableView>(_ presentableViewType: V.Type) {
+    public func registerDefaultPresentableView<V: PresentableView>(_ presentableViewType: V.Type) {
         let route = V.defaultRoute
-        registePresentableView(V.self, for: route)
+        registerPresentableView(V.self, for: route)
     }
     
     /// 使用默认路由注册对应展示界面
     @inlinable
-    public func registeDefaultPresentableView<V: PresentableView>(_ presentableViewType: V.Type) where V.InitData == Void {
+    public func registerDefaultPresentableView<V: PresentableView>(_ presentableViewType: V.Type) where V.InitData == Void {
         let route = V.defaultRoute
-        registePresentableView(V.self, for: route)
+        registerPresentableView(V.self, for: route)
     }
     
     /// 注册对应展示界面
-    public func registePresentableView<V: PresentableView>(
+    public func registerPresentableView<V: PresentableView>(
         _ presentableViewType: V.Type,
         for route: ViewRoute<V.InitData>
     ) {
@@ -50,7 +50,7 @@ public final class PresentCenter {
     }
     
     /// 注册对应展示界面
-    public func registePresentableView<V: PresentableView>(
+    public func registerPresentableView<V: PresentableView>(
         _ presentableViewType: V.Type,
         for route: ViewRoute<V.InitData>
     ) where V.InitData == Void {
