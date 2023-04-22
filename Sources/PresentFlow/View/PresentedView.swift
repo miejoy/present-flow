@@ -16,7 +16,6 @@ struct PresentedView: TrackableView {
     @Environment(\.presentManager) var presentManager
 
     @Environment(\.sceneId) var sceneId
-    @Environment(\.isPresented) var isPresented
     /// 关闭按钮
     @Environment(\.presentedCloseView) var closeView
     
@@ -36,10 +35,8 @@ struct PresentedView: TrackableView {
         )
         .interactiveDismissDisabled(presetedState.isFrozen)
         .onDisappear {
-            // 这里需要确保是异步的，并确保是 dismiss 时的 disapper
-            if (!isPresented) {
-                presentManager.apply(action: .didDisappearOnLevel(level))
-            }
+            // 这里需要确保是异步的
+            presentManager.apply(action: .didDisappearOnLevel(level))
         }
         .environment(\.presentLevel, level)
     }
