@@ -798,6 +798,9 @@ class FakePresentedView {
         
         // 这里调用之后，理论上会构造对应 View
         _ = self.innerStore.state.makeView(sceneId, AnyView(EmptyView()))
+        if level > 0 {
+            self.store.apply(action: .didAppearOnLevel(self.level))
+        }
 //        AnyView._makeView(view: view, inputs: view)
     }
 }

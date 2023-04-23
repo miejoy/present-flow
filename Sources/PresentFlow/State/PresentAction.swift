@@ -43,6 +43,7 @@ public struct PresentAction: Action {
     
     /// 内部使用事件
     enum InnerAction {
+        case didAppearOnLevel(UInt)
         case didDisappearOnLevel(UInt)
     }
     
@@ -536,6 +537,14 @@ extension PresentAction {
 
 // MARK: - Inner
 extension PresentAction {
+    /// 通知当前层级界面已经显示完成，如果下一层还需要展示，就继续处理
+    ///
+    /// - Parameter level: 已经显示完成界面对应的层级
+    /// - Returns Self: 返回构造好的自己
+    static func didAppearOnLevel(_ level: UInt) -> Self {
+        .init(action: .inner(.didAppearOnLevel(level)))
+    }
+    
     /// 通知当前层级界面已经消失，内部使用
     ///
     /// - Parameter level: 已经消失界面对应的层级

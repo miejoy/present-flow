@@ -123,6 +123,17 @@ enum PresentReducer {
     
     static func reducerInnerAction(_ state: inout PresentState, _ action: PresentAction.InnerAction) {
         switch action {
+        case .didAppearOnLevel(let level):
+            guard level == state.curLevel + 1 else {
+                // fault
+                PresentMonitor.shared.fatalError("The view did appear is not the top view. level=\(level), curLevel=\(state.curLevel)")
+                return
+            }
+            if state.turnAroundLevel == state.curLevel {
+                state.turnAroundLevel += 1
+            }
+            state.curLevel += 1
+            checkSeekingOn(&state)
         case .didDisappearOnLevel(let level):
             guard level == state.curLevel else {
                 // fault
@@ -190,29 +201,19 @@ enum PresentReducer {
         if state.curLevel == state.turnAroundLevel {
             // 直接转到 targetLevel，因为 targetLevel 不可能 < turnAroundLevel, 所以 targetLevel >= curLevel
             if state.targetLevel > state.curLevel {
-                var processLevel = state.targetLevel - 1
-                var prevIsFullCover = state.storage.innerPresentStores[Int(state.targetLevel)].first?.isFullCover ?? false
-                while processLevel >= state.curLevel {
-                    if let processStore = state.storage.innerPresentStores[Int(processLevel)].last {
-                        processStore.apply(action: .present(prevIsFullCover))
-                        prevIsFullCover = processStore.isFullCover
-                        if processLevel == 0 {
-                            break
-                        }
-                        processLevel -= 1
+                // 这里需要一层一层的 present
+                let prevIsFullCover = state.storage.innerPresentStores[Int(state.curLevel + 1)].first?.isFullCover ?? false
+                if let processStore = state.storage.innerPresentStores[Int(state.curLevel)].last {
+                    processStore.apply(action: .present(prevIsFullCover))
+                } else {
+                    // 这里存在问题 fault
+                    if state.curLevel == 0 {
+                        PresentMonitor.shared.fatalError("Inner present store not found on level '\(state.curLevel)', use 'PresentFlowView' to wrapper you view")
                     } else {
-                        // 这里存在问题 fault
-                        if processLevel == 0 {
-                            PresentMonitor.shared.fatalError("Inner present store not found on level '\(processLevel)', use 'PresentFlowView' to wrapper you view")
-                        } else {
-                            PresentMonitor.shared.fatalError("Inner present store not found on level '\(processLevel)'")
-                        }
-                        break
+                        PresentMonitor.shared.fatalError("Inner present store not found on level '\(state.curLevel)'")
                     }
                 }
             }
-            state.curLevel = state.targetLevel
-            state.turnAroundLevel = state.curLevel
             state.isSeekingTurn = false
         } else {
             // turnAroundLevel < curLevel
