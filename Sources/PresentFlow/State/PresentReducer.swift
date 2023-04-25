@@ -182,7 +182,7 @@ enum PresentReducer {
             // 没有设置 target 相关内容，直接返回当前的
             return presentState.targetLevel
         }
-        let foundStores = presentState.storage.innerPresentStores.prefix(Int(presentState.targetLevel)).last { arrStores in
+        let foundStores = presentState.storage.innerPresentStores.prefix(Int(presentState.targetLevel + 1)).last { arrStores in
             arrStores.first?.route == targetRoute
         }
         if let foundLevel = foundStores?.first?.level {

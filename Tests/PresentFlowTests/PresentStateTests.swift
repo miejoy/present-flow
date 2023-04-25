@@ -623,6 +623,17 @@ final class PresentStateTests: XCTestCase {
         XCTAssertEqual(presentStore.storage.innerPresentStores[2].count, 1)
         XCTAssertEqual(presentStore.storage.innerPresentStores[2].first?.isPresenting, false)
         XCTAssertEqual(presentStore.storage.innerPresentStores[2].first?.isFullCoverPresenting, false)
+        
+        presentStore.send(action: .dismissViewOnRoute(PresentSecondView.defaultRoute))
+        
+        XCTAssertEqual(presentStore.storage.innerPresentStores.count, 2)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[0].count, 1)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[0].first?.isPresenting, true)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[0].first?.isFullCoverPresenting, false)
+        
+        XCTAssertEqual(presentStore.storage.innerPresentStores[1].count, 1)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[1].first?.isPresenting, false)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[1].first?.isFullCoverPresenting, false)
     }
     
     func testDismissNotFound() {
