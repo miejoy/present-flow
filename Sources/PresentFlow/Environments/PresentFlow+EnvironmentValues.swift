@@ -22,7 +22,7 @@ extension EnvironmentValues {
         set { self[PresentLevelKey.self] = newValue }
     }
     
-    /// 展示的层级，从 0 开始
+    /// 导航栏左侧关闭按钮
     public var presentedCloseView: AnyView {
         get { self[PresentedCloseViewKey.self] }
         set { self[PresentedCloseViewKey.self] = newValue }
@@ -31,18 +31,16 @@ extension EnvironmentValues {
 
 /// 展示存储器对应的 key
 struct PresentStoreKey: EnvironmentKey {
-    static var defaultValue: Store<PresentState>? {
-        return nil
-    }
+    static let defaultValue: Store<PresentState>? = nil
 }
 
 /// 展示的层级
 struct PresentLevelKey: EnvironmentKey {
-    static var defaultValue: UInt = 0
+    static let defaultValue: UInt = 0
 }
 
 /// 展示的界面导航关闭按钮
 struct PresentedCloseViewKey: EnvironmentKey {
-    static var defaultValue: AnyView = AnyView(Image(systemName: "multiply.circle.fill").foregroundColor(Color.gray)
+    static let defaultValue: AnyView = AnyView(Image(systemName: "multiply.circle.fill").foregroundColor(Color.gray)
         .frame(width: 30, height: 44))
 }

@@ -28,7 +28,7 @@ enum PresentReducer {
     
     static func reducerPresentAction(_ state: inout PresentState, _ action: PresentAction.InnerPresentAction) {
         var notFoundError: TargetRouteNotFound? = nil
-        let baseOnLevel = getTargetLevel(on: state, action.baseOnRoute, action.baseOnLevel, &notFoundError)
+        let baseOnLevel = getTargetLevel(on: state, action.baseOnLevel, &notFoundError)
         if let notFoundError = notFoundError {
             PresentMonitor.shared.record(event: .presentFailed(action.route, notFoundError))
             return
@@ -66,9 +66,8 @@ enum PresentReducer {
             state.storage.innerPresentStores.append(arrStores)
         }
         
-        
         // 根据情况标记展示
-        state.targetLevel = presentedIndex
+        state.topLevel = presentedIndex
         if baseOnLevel < state.turnAroundLevel {
             state.turnAroundLevel = baseOnLevel
         }
@@ -80,7 +79,7 @@ enum PresentReducer {
     
     static func reducerDismissAction(_ state: inout PresentState, _ action: PresentAction.InnerDismissAction) {
         var notFoundError: TargetRouteNotFound? = nil
-        var targetLevel = getTargetLevel(on: state, action.targetRoute, action.targetLevel, &notFoundError)
+        var targetLevel = getTargetLevel(on: state, action.targetLevel, &notFoundError)
         if let notFoundError = notFoundError {
             PresentMonitor.shared.record(event: .dismissFailed(notFoundError))
             return
@@ -90,9 +89,9 @@ enum PresentReducer {
         } else {
             targetLevel = 0
         }
-        state.targetLevel = targetLevel
-        if state.targetLevel < state.turnAroundLevel {
-            state.turnAroundLevel = state.targetLevel
+        state.topLevel = targetLevel
+        if state.topLevel < state.turnAroundLevel {
+            state.turnAroundLevel = state.topLevel
         }
         
         checkSeekingOn(&state)
@@ -102,7 +101,7 @@ enum PresentReducer {
     
     static func reducerFreezeAction(_ state: inout PresentState, _ action: PresentAction.InnerFreezeAction) {
         var notFoundError: TargetRouteNotFound? = nil
-        let targetLevel = getTargetLevel(on: state, action.targetRoute, action.targetLevel, &notFoundError)
+        let targetLevel = getTargetLevel(on: state, action.targetLevel, &notFoundError)
         if let notFoundError = notFoundError {
             if action.isFrozen {
                 PresentMonitor.shared.record(event: .freezeFailed(notFoundError))
@@ -141,23 +140,23 @@ enum PresentReducer {
                 return
             }
             // 移除对应 store
-            if state.targetLevel == state.curLevel && state.curLevel == state.turnAroundLevel {
+            if state.topLevel == state.curLevel && state.curLevel == state.turnAroundLevel {
                 // 被动销毁最顶层
                 while state.storage.innerPresentStores.count > state.curLevel  {
                     _ = state.storage.innerPresentStores.popLast()
                 }
                 state.curLevel -= 1
-                state.targetLevel = state.curLevel
+                state.topLevel = state.curLevel
                 state.turnAroundLevel = state.curLevel
                 return
             }
-            // 存在转折，因为 turnAroundLevel <= 其他两个 level，三个 level 又不完全相等，必然 turnAroundLevel < Min(curLevel, targetLevel)
-            if state.targetLevel >= state.curLevel {
+            // 存在转折，因为 turnAroundLevel <= 其他两个 level，三个 level 又不完全相等，必然 turnAroundLevel < Min(curLevel, topLevel)
+            if state.topLevel >= state.curLevel {
                 // 当前层需要保留最新 store
                 let arrStores = state.storage.innerPresentStores[Int(state.curLevel)]
                 state.storage.innerPresentStores[Int(state.curLevel)] = .init(arrStores.prefix(1))
             } else {
-                // curLevel > targetLevel, 完全是多出来的，可以直接移除
+                // curLevel > topLevel, 完全是多出来的，可以直接移除
                 while state.storage.innerPresentStores.count > state.curLevel  {
                     _ = state.storage.innerPresentStores.popLast()
                 }
@@ -169,38 +168,39 @@ enum PresentReducer {
     }
     
     // MARK: - Get Level
-    static func getTargetLevel(on presentState: PresentState, _ targetRoute: AnyViewRoute?, _ targetLevel: UInt?, _ notFoundError: inout TargetRouteNotFound?) -> UInt {
+    static func getTargetLevel(on presentState: PresentState, _ targetLevel: PresentLevelOf?, _ notFoundError: inout TargetRouteNotFound?) -> UInt {
         if let targetLevel = targetLevel {
-            if targetLevel > presentState.targetLevel {
-                // 找不到对应 level，所有基于的都以 targetLevel 为主
-                notFoundError = .level(targetLevel)
+            switch targetLevel {
+            case .level(let theLevel):
+                if theLevel > presentState.topLevel {
+                    // 找不到对应 level，所有基于的都以 targetLevel 为主
+                    notFoundError = .level(theLevel)
+                }
+                return theLevel
+            case .route(let targetRoute):
+                let foundStores = presentState.storage.innerPresentStores.prefix(Int(presentState.topLevel + 1)).last { arrStores in
+                    arrStores.first?.route == targetRoute
+                }
+                if let foundLevel = foundStores?.first?.level {
+                    return foundLevel
+                }
+                notFoundError = .route(targetRoute)
+                return presentState.topLevel
             }
-            return targetLevel
         }
         
-        guard let targetRoute = targetRoute else {
-            // 没有设置 target 相关内容，直接返回当前的
-            return presentState.targetLevel
-        }
-        let foundStores = presentState.storage.innerPresentStores.prefix(Int(presentState.targetLevel + 1)).last { arrStores in
-            arrStores.first?.route == targetRoute
-        }
-        if let foundLevel = foundStores?.first?.level {
-            return foundLevel
-        }
-        
-        notFoundError = .route(targetRoute)
-        return presentState.targetLevel
+        // 没有设置 target 相关内容，直接返回当前的
+        return presentState.topLevel
     }
     
     // MARK: - Seeking
     
+    /// 检查搜索回转状态，只有在 内部 disAppear 的时候 byForce = true，原因是这时候 isSeekingTurn = true
     static func checkSeekingOn(_ state: inout PresentState, _ byForce: Bool = false) {
-        // turnAroundLevel 只可能 <= curLevel 并且 <= targetLevel, 即 turnAroundLevel 必然是 三个中的最小值
-        //
+        // turnAroundLevel 只可能 <= curLevel 并且 <= topLevel, 即 turnAroundLevel 必然是 三个中的最小值
         if state.curLevel == state.turnAroundLevel {
-            // 直接转到 targetLevel，因为 targetLevel 不可能 < turnAroundLevel, 所以 targetLevel >= curLevel
-            if state.targetLevel > state.curLevel {
+            // 直接转到 topLevel，因为 topLevel 不可能 < turnAroundLevel, 所以 topLevel >= curLevel
+            if state.topLevel > state.curLevel {
                 // 这里需要一层一层的 present
                 let prevIsFullCover = state.storage.innerPresentStores[Int(state.curLevel + 1)].first?.isFullCover ?? false
                 if let processStore = state.storage.innerPresentStores[Int(state.curLevel)].last {

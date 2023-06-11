@@ -55,7 +55,7 @@ extension Store where State == PresentState {
     
     /// 消失最顶层界面
     @inlinable
-    public func dismiss() {
+    public func dismissTopView() {
         self.send(action: .dismissTopView())
     }
     

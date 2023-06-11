@@ -23,7 +23,6 @@ PresentFlow 是自定义 RSV(Resource & State & View) 设计模式中 State 层�
 - PresentAction: 展示管理器操作事件，主要对外提供 展示(present)、消失(dismiss)、冻结(freeze) 三类事件
 - PresentFlowView: 展示流包装界面，如果需要可操作的展示流，必须在最跟不使用该界面包装起来，用 PresentModifier 修饰是同样的效果
 - PresentableView: 可展示界面协议，所以需要展示的界面需要遵循这个协议
-- PresentRoute: 展示界面路由，每个可展示界面都有一个默认的展示路由，可通过这个路由找到展示流中的对应界面
 - PresentCenter: 展示中心，用于注册可展示界面
 
 ### 为 SwiftUI 提供的如下环境变量:

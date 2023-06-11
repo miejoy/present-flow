@@ -9,18 +9,19 @@ import DataFlow
 import ViewFlow
 import SwiftUI
 
-
+// 展示流相关状态
 public struct PresentState: FullSceneSharableState {
     public typealias UpState = SceneState
     
     public typealias BindAction = PresentAction
     
-    let sceneId: SceneId
+    /// 当前场景ID
+    public let sceneId: SceneId
     
     /// 当前显示层级，curLevel=0 标识没有 present 任何 View
     public var curLevel: UInt = 0
     /// 目标显示层级，外部只能控制目标层级，因为 present 和 dismiss 只能一个接一个的进行
-    var targetLevel: UInt = 0
+    public var topLevel: UInt = 0
     
     /// 回转层级，默认跟 curLevel 相等
     var turnAroundLevel: UInt = 0
@@ -38,6 +39,7 @@ public struct PresentState: FullSceneSharableState {
     
     let presentCenter: PresentCenter = .init()
     
+    // 必须要的，InitializableState 限制的
     public init() {
         self.init(on: .main)
     }

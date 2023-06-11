@@ -13,12 +13,15 @@ import SwiftUI
 import XCTViewFlow
 
 final class PresentCenterTests: XCTestCase {
+    
+    let defaultViewRouteId: String = "__default__"
+    
     func testRouteRegister() throws {
         PresentCenter.shared.registerMap = [:]
         let presentCenter = PresentCenter.shared
-        let route1 = ViewRoute<Void>(routeId: s_defaultViewRouteId)
-        let route2 = ViewRoute<Void>(routeId: s_defaultViewRouteId)
-        let route3 = ViewRoute<Void>(routeId: "default")
+        let route1 = ViewRoute<Void>(defaultViewRouteId)
+        let route2 = ViewRoute<Void>(defaultViewRouteId)
+        let route3 = ViewRoute<Void>("default")
         
         presentCenter.registerMap[route1.eraseToAnyRoute()] = .init(PresentFirstView.self)
         
@@ -50,7 +53,7 @@ final class PresentCenterTests: XCTestCase {
         XCTAssertEqual(presentCenter.registerMap.count, 1)
         XCTAssertNotNil(presentCenter.registerMap[PresentThirdView.defaultRoute.eraseToAnyRoute()])
         
-        let secondRoute = ViewRoute<String>(routeId: "second")
+        let secondRoute = ViewRoute<String>("second")
         presentCenter.registerPresentableView(PresentSecondView.self, for: secondRoute)
         XCTAssertEqual(presentCenter.registerMap.count, 2)
         XCTAssertNotNil(presentCenter.registerMap[secondRoute.eraseToAnyRoute()])
@@ -118,7 +121,7 @@ final class PresentCenterTests: XCTestCase {
         PresentCenter.shared.externalViewMaker = nil
         let sceneId = SceneId.custom("otherScene2")
         
-        let route = ViewRoute<Int>(routeId: "EmptyView")
+        let route = ViewRoute<Int>("EmptyView")
         let data: Int = 1
         var callRouteData: ViewRouteData? = nil
         
@@ -146,26 +149,28 @@ final class PresentCenterTests: XCTestCase {
         XCTAssertEqual(callRouteData?.route, route.eraseToAnyRoute())
         XCTAssertEqual(callRouteData?.initData as? Int, data)
         
+        ViewTest.releaseHost(host)
+        
         PresentCenter.shared.externalViewMaker = nil
     }
     
     func testRegisterExternalViewMakerOnScene() {
         let sceneId = SceneId.custom("otherScene3")
         
-        let route = ViewRoute<Int>(routeId: "EmptyView")
+        let route = ViewRoute<Int>("EmptyView")
         let data: Int = 1
         var callRouteData: ViewRouteData? = nil
         
         let view = Text("test")
             .modifier(PresentModifier())
-            .onAppear {
-                Store<PresentState>.shared(on: sceneId).present(route.wrapper(data))
-            }
             .registerPresentOn { presentCenter in
                 presentCenter.registerExternalViewMaker { routeData, sceneId in
                     callRouteData = routeData
                     return AnyView(EmptyView())
                 }
+            }
+            .onAppear {
+                Store<PresentState>.shared(on: sceneId).present(route.wrapper(data))
             }
             .environment(\.sceneId, sceneId)
         

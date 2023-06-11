@@ -21,13 +21,13 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
     typealias BindAction = InnerPresentAction
     
     let level: UInt
-        
+    
     // MARK: - For Presented
     let route: AnyViewRoute
     let navigationState: NavigationState?
     let viewMaker: PresentedViewMaker
     
-    /// 是否冻住当前 view
+    /// 是否冻住当前 view，针对用户操作的
     var isFrozen = false
     
     /// 标记当前 view 是不是全屏幕，给上级 state 使用
@@ -40,7 +40,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
     
     init(
         level: UInt,
-        route: AnyViewRoute = ViewRoute<Void>().eraseToAnyRoute(),
+        route: AnyViewRoute = ViewRoute<Void>("").eraseToAnyRoute(),
         navigationState: NavigationState? = nil,
         viewMaker: PresentedViewMaker = EmptyView()
     ) {
@@ -68,7 +68,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
             }
             
             #if os(iOS) || os(tvOS)
-            if navigationState.needCloseButtom {
+            if navigationState.needCloseButton {
                 view = AnyView(view.navigationBarItems(leading: Button(action: {
                     presentStore.dismissViewOnLevel(level)
                 }, label: {
@@ -156,5 +156,5 @@ final class InnerPresentWrapperStorage: ObservableObject {
 
 struct NavigationState {
     var navigationTitle: String? = nil
-    var needCloseButtom: Bool = false
+    var needCloseButton: Bool = false
 }

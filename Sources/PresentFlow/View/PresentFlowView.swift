@@ -28,16 +28,14 @@ public struct PresentFlowView<Content: View>: View {
     }
     
     public var body: some View {
-        ZStack {
-            content
-                .sheet(isPresented: $presetingState.binding(of: \.isPresenting)) {
-                    PresentedView(level: level + 1)
-                }
-                #if os(iOS) || os(tvOS) || os(watchOS)
-                .fullScreenCover(isPresented: $presetingState.binding(of: \.isFullCoverPresenting)) {
-                    PresentedView(level: level + 1)
-                }
-                #endif
-        }
+        content
+            .sheet(isPresented: $presetingState.binding(of: \.isPresenting)) {
+                PresentedView(level: level + 1)
+            }
+            #if os(iOS) || os(tvOS) || os(watchOS)
+            .fullScreenCover(isPresented: $presetingState.binding(of: \.isFullCoverPresenting)) {
+                PresentedView(level: level + 1)
+            }
+            #endif
     }
 }

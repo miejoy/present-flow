@@ -464,7 +464,7 @@ final class PresentStateTests: XCTestCase {
         XCTAssertEqual(presentStore.storage.innerPresentStores.count, 2)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[1].first?.viewMaker as? PresentableViewMaker<PresentFirstView>)
         
-        presentStore.dismiss()
+        presentStore.dismissTopView()
         
         XCTAssertEqual(presentStore.storage.innerPresentStores.count, 1)
         XCTAssertEqual(presentStore.storage.innerPresentStores[0].count, 1)

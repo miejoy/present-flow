@@ -16,7 +16,7 @@ public final class PresentCenter {
         let line: Int
     }
     
-    public static var shared: PresentCenter = .init()
+    public static let shared: PresentCenter = .init()
     
     var registerMap: [AnyViewRoute: PresentableViewWrapper] = [:]
     var registerCallSet: Set<CallId> = []

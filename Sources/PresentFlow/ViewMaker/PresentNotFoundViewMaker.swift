@@ -29,7 +29,7 @@ public struct PresentNotFoundViewMaker : PresentedViewMaker {
         let notFoundView = VStack {
             Text("Present view not found with route '\(route.description)'")
             Button("Dismiss") {
-                Store<PresentState>.shared(on: sceneId).dismiss()
+                Store<PresentState>.shared(on: sceneId).dismissTopView()
             }
         }
         return AnyView(notFoundView)
