@@ -2,7 +2,7 @@
 
 PresentFlow 是基于 ViewFlow 的 展示流操作模块，为 SwiftUI 提供方便的展示和消失界面功能。
 
-PresentFlow 是自定义 RSV(Resource & State & View) 设计模式中 State 层的应用模块，同时也是 View 层的应用模块。负责 View 的提供可操作的展示流。
+PresentFlow 是自定义 RSV(Resource & State & View) 设计模式中 State 层的应用模块，同时也是 View 层的应用模块。负责 View 提供可操作的展示流。
 
 [![Swift](https://github.com/miejoy/present-flow/actions/workflows/test.yml/badge.svg)](https://github.com/miejoy/present-flow/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/miejoy/present-flow/branch/main/graph/badge.svg)](https://codecov.io/gh/miejoy/present-flow)
@@ -21,7 +21,7 @@ PresentFlow 是自定义 RSV(Resource & State & View) 设计模式中 State 层�
 
 - PresentState: 展示核心状态，对应 Store 叫展示管理器，外部可通过这个管理器对展示流进行各种操作，如果 展示、消失、冻结等
 - PresentAction: 展示管理器操作事件，主要对外提供 展示(present)、消失(dismiss)、冻结(freeze) 三类事件
-- PresentFlowView: 展示流包装界面，如果需要可操作的展示流，必须在最跟不使用该界面包装起来，用 PresentModifier 修饰是同样的效果
+- PresentFlowView: 展示流包装界面，如果需要可操作的展示流，必须在最根部使用该界面包装起来，用 PresentModifier 修饰是同样的效果
 - PresentableView: 可展示界面协议，所以需要展示的界面需要遵循这个协议
 - PresentCenter: 展示中心，用于注册可展示界面
 
