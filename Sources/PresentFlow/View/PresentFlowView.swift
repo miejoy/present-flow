@@ -17,6 +17,8 @@ public struct PresentFlowView<Content: View>: View {
     @ViewBuilder var content: Content
     @InnerPresentWrapper var presetingState: InnerPresentState
     
+    @Environment(\.presentManager) var presentManager
+    
     public init(@ViewBuilder content: () -> Content ) {
         self.init(level: 0, content: content)
     }
@@ -37,5 +39,6 @@ public struct PresentFlowView<Content: View>: View {
                 PresentedView(level: level + 1)
             }
             #endif
+            .environment(\.presentManager, presentManager) // 减少内部使用时的调用次数
     }
 }

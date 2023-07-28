@@ -139,9 +139,9 @@ final class PresentCenterTests: XCTestCase {
             }
             .environment(\.sceneId, sceneId)
         
-        let host = ViewTest.host(view)
-        
         XCTAssertNil(callRouteData)
+        
+        let host = ViewTest.host(view)
         
         // 这里才会真正展示新界面
         ViewTest.refreshHost(host)
@@ -174,9 +174,9 @@ final class PresentCenterTests: XCTestCase {
             }
             .environment(\.sceneId, sceneId)
         
-        let host = ViewTest.host(view)
-        
         XCTAssertNil(callRouteData)
+        
+        let host = ViewTest.host(view)        
         
         // 这里才会真正展示新界面
         ViewTest.refreshHost(host)
