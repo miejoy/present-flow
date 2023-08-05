@@ -10,13 +10,23 @@ import SwiftUI
 import ViewFlow
 
 struct PresentableViewMaker<P: PresentableView> : PresentedViewMaker {
-    let data: P.InitData
+    let makeView: () -> P
+    
+    init(makeView: @escaping () -> P) {
+        self.makeView = makeView
+    }
+    
+    init(data initData: P.InitData) {
+        self.init {
+            P(initData)
+        }
+    }
     
     func canMakeView(on sceneId: SceneId) -> Bool {
         return true
     }
     
     func makeView(on sceneId: SceneId) -> AnyView {
-        return AnyView(P(data))
+        return AnyView(makeView())
     }
 }

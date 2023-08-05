@@ -14,6 +14,15 @@ extension Store where State == PresentState {
     
     /// 展示对应界面
     ///
+    /// - Parameter view: 需要展示的界面
+    /// - Parameter data: 初始化展示界面需要的数据
+    @inlinable
+    public func present<P: PresentableView>(_ view: P) {
+        self.send(action: .present(view))
+    }
+    
+    /// 展示对应界面
+    ///
     /// - Parameter viewType: 需要展示的界面类型
     /// - Parameter data: 初始化展示界面需要的数据
     @inlinable
@@ -79,6 +88,15 @@ extension Store where State == PresentState {
 // MARK: - Present Full Cover
 
 extension Store where State == PresentState {
+    /// 展示对应界面
+    ///
+    /// - Parameter view: 需要展示的界面类型
+    /// - Parameter data: 初始化展示界面需要的数据
+    @inlinable
+    public func presentFullCover<P: PresentableView>(_ view: P) {
+        self.send(action: .present(view, isFullCover: true))
+    }
+    
     /// 展示对应界面
     ///
     /// - Parameter viewType: 需要展示的界面类型
