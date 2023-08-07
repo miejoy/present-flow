@@ -19,6 +19,22 @@ final class PresentCenterTests: XCTestCase {
     func testRouteRegister() throws {
         PresentCenter.shared.registerMap = [:]
         let presentCenter = PresentCenter.shared
+        let route1 = ViewRoute<String>(defaultViewRouteId)
+        let route2 = ViewRoute<String>(defaultViewRouteId)
+        let route3 = ViewRoute<String>("default")
+        
+        presentCenter.registerMap[route1.eraseToAnyRoute()] = .init(PresentSecondView.self)
+        
+        let maker2 = presentCenter.registerMap[route2.eraseToAnyRoute()]
+        XCTAssertNotNil(maker2)
+        
+        let maker3 = presentCenter.registerMap[route3.eraseToAnyRoute()]
+        XCTAssertNil(maker3)
+    }
+    
+    func testVoidRouteRegister() throws {
+        PresentCenter.shared.registerMap = [:]
+        let presentCenter = PresentCenter.shared
         let route1 = ViewRoute<Void>(defaultViewRouteId)
         let route2 = ViewRoute<Void>(defaultViewRouteId)
         let route3 = ViewRoute<Void>("default")
@@ -183,6 +199,70 @@ final class PresentCenterTests: XCTestCase {
         
         XCTAssertEqual(callRouteData?.route, route.eraseToAnyRoute())
         XCTAssertEqual(callRouteData?.initData as? Int, data)
+    }
+    
+    func testRegisterWithModifier() {
+        PresentCenter.shared.registerMap = [:]
+        let presentCenter = PresentCenter.shared
+        
+        var modifier1GetCall = false
+        presentCenter.registerDefaultPresentableView(PresentFirstView.self) { view in
+            modifier1GetCall = true
+            return view
+        }
+        
+        XCTAssertEqual(presentCenter.registerMap.count, 1)
+        XCTAssertNotNil(presentCenter.registerMap[PresentFirstView.defaultRoute.eraseToAnyRoute()])
+        
+        var modifier2GetCall = false
+        presentCenter.registerDefaultPresentableView(PresentSecondView.self) { view in
+            modifier2GetCall = true
+            return view
+        }
+        XCTAssertEqual(presentCenter.registerMap.count, 2)
+        XCTAssertNotNil(presentCenter.registerMap[PresentSecondView.defaultRoute.eraseToAnyRoute()])
+        
+        if let viewMaker = presentCenter.registerMap[PresentFirstView.defaultRoute.eraseToAnyRoute()] {
+            XCTAssertFalse(modifier1GetCall)
+            _ = viewMaker.run(())
+            XCTAssertTrue(modifier1GetCall)
+        }
+        
+        if let viewMaker = presentCenter.registerMap[PresentSecondView.defaultRoute.eraseToAnyRoute()] {
+            XCTAssertFalse(modifier2GetCall)
+            _ = viewMaker.run("")
+            XCTAssertTrue(modifier2GetCall)
+        }
+    }
+    
+    func testRegisterWithModifierOnView() {
+        PresentCenter.shared.registerMap = [:]
+        
+        let sceneId = SceneId.custom("otherScene4")
+        
+        var modifierGetCall = false
+        
+        let view = Text("test")
+            .modifier(PresentModifier())
+            .registerPresentOn { presentCenter in
+                presentCenter.registerDefaultPresentableView(PresentFirstView.self) { view in
+                    modifierGetCall = true
+                    return view
+                }
+            }
+            .onAppear {
+                Store<PresentState>.shared(on: sceneId).present(PresentFirstView.defaultRoute)
+            }
+            .environment(\.sceneId, sceneId)
+        
+        XCTAssertFalse(modifierGetCall)
+        
+        let host = ViewTest.host(view)
+                
+        // 这里才会真正展示新界面，这里目前没有用
+        ViewTest.refreshHost(host)
+        
+        XCTAssertTrue(modifierGetCall)
     }
 }
 

@@ -25,40 +25,84 @@ public final class PresentCenter {
     
     /// 使用默认路由注册对应展示界面
     @inlinable
-    public func registerDefaultPresentableView<V: PresentableView>(_ presentableViewType: V.Type) {
+    public func registerDefaultPresentableView<V: PresentableView>(
+        _ presentableViewType: V.Type
+    ) {
         let route = V.defaultRoute
         registerPresentableView(V.self, for: route)
     }
     
     /// 使用默认路由注册对应展示界面
     @inlinable
-    public func registerDefaultPresentableView<V: PresentableView>(_ presentableViewType: V.Type) where V.InitData == Void {
+    public func registerDefaultPresentableView<V: PresentableView>(
+        _ presentableViewType: V.Type
+    ) where V.InitData == Void {
         let route = V.defaultRoute
         registerPresentableView(V.self, for: route)
+    }
+    
+    /// 使用默认路由注册对应展示界面
+    @inlinable
+    public func registerDefaultPresentableView<V: PresentableView>(
+        _ presentableViewType: V.Type,
+        _ modifier: @escaping ((V) -> some View)
+    ) {
+        let route = V.defaultRoute
+        registerPresentableView(V.self, for: route, modifier)
+    }
+    
+    /// 使用默认路由注册对应展示界面
+    @inlinable
+    public func registerDefaultPresentableView<V: PresentableView>(
+        _ presentableViewType: V.Type,
+        _ modifier: @escaping ((V) -> some View)
+    ) where V.InitData == Void {
+        let route = V.defaultRoute
+        registerPresentableView(V.self, for: route, modifier)
+    }
+    
+    /// 注册对应展示界面
+    @inlinable
+    public func registerPresentableView<V: PresentableView>(
+        _ presentableViewType: V.Type,
+        for route: ViewRoute<V.InitData>
+    ) {
+        registerPresentableView(presentableViewType, for: route, { $0 })
+    }
+    
+    /// 注册对应展示界面
+    @inlinable
+    public func registerPresentableView<V: PresentableView>(
+        _ presentableViewType: V.Type,
+        for route: ViewRoute<V.InitData>
+    ) where V.InitData == Void {
+        registerPresentableView(presentableViewType, for: route, { $0 })
     }
     
     /// 注册对应展示界面
     public func registerPresentableView<V: PresentableView>(
         _ presentableViewType: V.Type,
-        for route: ViewRoute<V.InitData>
+        for route: ViewRoute<V.InitData>,
+        _ modifier: @escaping ((V) -> some View)
     ) {
         let key = route.eraseToAnyRoute()
         if registerMap[key] != nil {
             PresentMonitor.shared.fatalError("Duplicate registration of PresentableView '\(key)'")
         }
-        registerMap[key] = .init(V.self)
+        registerMap[key] = .init(V.self, modifier)
     }
     
     /// 注册对应展示界面
     public func registerPresentableView<V: PresentableView>(
         _ presentableViewType: V.Type,
-        for route: ViewRoute<V.InitData>
+        for route: ViewRoute<V.InitData>,
+        _ modifier: @escaping ((V) -> some View)
     ) where V.InitData == Void {
         let key = route.eraseToAnyRoute()
         if registerMap[key] != nil {
             PresentMonitor.shared.fatalError("Duplicate registration of PresentableView '\(key)'")
         }
-        registerMap[key] = .init(V.self)
+        registerMap[key] = .init(V.self, modifier)
     }
     
     public func registerExternalViewMaker(_ viewMaker: @escaping (_ routeData: ViewRouteData, _ sceneId: SceneId) -> AnyView) {
@@ -74,9 +118,17 @@ struct PresentableViewWrapper {
     let run: (Any) -> AnyView
     
     init<V: PresentableView>(_ presentableViewType: V.Type) {
+        self.init(presentableViewType, { $0 })
+    }
+    
+    init<V: PresentableView>(_ presentableViewType: V.Type) where V.InitData == Void {
+        self.init(presentableViewType, { $0 })
+    }
+    
+    init<V: PresentableView>(_ presentableViewType: V.Type, _ modifier: @escaping ((V) -> some View)) {
         self.run = { data -> AnyView in
             if let data = data as? V.InitData {
-                return AnyView(V(data))
+                return AnyView(modifier(V(data)))
             }
             // 这里需要记录异常
             PresentMonitor.shared.fatalError("Make presentable view '\(String(describing: V.self))' failed. Convert to initialization data of '\(String(describing: V.InitData.self))' failed")
@@ -84,9 +136,9 @@ struct PresentableViewWrapper {
         }
     }
     
-    init<V: PresentableView>(_ presentableViewType: V.Type) where V.InitData == Void  {
-        self.run = { data -> AnyView in
-            return AnyView(V(Void()))
+    init<V: PresentableView>(_ presentableViewType: V.Type, _ modifier: @escaping ((V) -> some View)) where V.InitData == Void {
+        self.run = { _ in
+            return AnyView(modifier(V(Void())))
         }
     }
     
