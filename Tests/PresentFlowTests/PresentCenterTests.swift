@@ -134,7 +134,7 @@ final class PresentCenterTests: XCTestCase {
     
     func testRegisterExternalViewMaker() {
         
-        PresentCenter.shared.externalViewMaker = nil
+        PresentCenter.shared.externalManager = nil
         let sceneId = SceneId.custom("otherScene2")
         
         let route = ViewRoute<Int>("EmptyView")
@@ -146,7 +146,7 @@ final class PresentCenterTests: XCTestCase {
             return AnyView(EmptyView())
         }
         
-        XCTAssertNotNil(PresentCenter.shared.externalViewMaker)
+        XCTAssertNotNil(PresentCenter.shared.externalManager)
         
         let view = Text("test")
             .modifier(PresentModifier())
@@ -167,7 +167,7 @@ final class PresentCenterTests: XCTestCase {
         
         ViewTest.releaseHost(host)
         
-        PresentCenter.shared.externalViewMaker = nil
+        PresentCenter.shared.externalManager = nil
     }
     
     func testRegisterExternalViewMakerOnScene() {
@@ -201,6 +201,49 @@ final class PresentCenterTests: XCTestCase {
         XCTAssertEqual(callRouteData?.initData as? Int, data)
     }
     
+    func testRegisterExternalViewMakerAndModifier() {
+        
+        PresentCenter.shared.externalManager = nil
+        let sceneId = SceneId.custom("otherScene4")
+        
+        let route = ViewRoute<Int>("EmptyView")
+        let data: Int = 1
+        var callRouteData: ViewRouteData? = nil
+        var callModifierRoute: AnyViewRoute? = nil
+        
+        PresentCenter.shared.registerExternalViewMaker { routeData, sceneId in
+            callRouteData = routeData
+            return AnyView(EmptyView())
+        } modifier: { route, sceneId, view in
+            callModifierRoute = route
+            return view
+        }
+        
+        XCTAssertNotNil(PresentCenter.shared.externalManager)
+        
+        let view = Text("test")
+            .modifier(PresentModifier())
+            .onAppear {
+                Store<PresentState>.shared(on: sceneId).present(route.wrapper(data))
+            }
+            .environment(\.sceneId, sceneId)
+        
+        XCTAssertNil(callRouteData)
+        
+        let host = ViewTest.host(view)
+        
+        // 这里才会真正展示新界面
+        ViewTest.refreshHost(host)
+        
+        XCTAssertEqual(callRouteData?.route, route.eraseToAnyRoute())
+        XCTAssertEqual(callRouteData?.initData as? Int, data)
+        XCTAssertEqual(callModifierRoute, route.eraseToAnyRoute())
+        
+        ViewTest.releaseHost(host)
+        
+        PresentCenter.shared.externalManager = nil
+    }
+    
     func testRegisterWithModifier() {
         PresentCenter.shared.registerMap = [:]
         let presentCenter = PresentCenter.shared
@@ -224,13 +267,13 @@ final class PresentCenterTests: XCTestCase {
         
         if let viewMaker = presentCenter.registerMap[PresentFirstView.defaultRoute.eraseToAnyRoute()] {
             XCTAssertFalse(modifier1GetCall)
-            _ = viewMaker.run(())
+            _ = viewMaker.modifier(AnyView(EmptyView()))
             XCTAssertTrue(modifier1GetCall)
         }
         
         if let viewMaker = presentCenter.registerMap[PresentSecondView.defaultRoute.eraseToAnyRoute()] {
             XCTAssertFalse(modifier2GetCall)
-            _ = viewMaker.run("")
+            _ = viewMaker.modifier(AnyView(EmptyView()))
             XCTAssertTrue(modifier2GetCall)
         }
     }
@@ -238,7 +281,7 @@ final class PresentCenterTests: XCTestCase {
     func testRegisterWithModifierOnView() {
         PresentCenter.shared.registerMap = [:]
         
-        let sceneId = SceneId.custom("otherScene4")
+        let sceneId = SceneId.custom("otherScene5")
         
         var modifierGetCall = false
         

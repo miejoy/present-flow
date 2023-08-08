@@ -77,7 +77,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
             }
             #endif
         }
-        return view
+        return viewMaker.modify(on: sceneId, view)
     }
     
     static func loadReducers(on store: Store<InnerPresentState>) {

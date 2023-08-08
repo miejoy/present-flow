@@ -12,6 +12,13 @@ import ViewFlow
 protocol PresentedViewMaker {
     func canMakeView(on sceneId: SceneId) -> Bool
     func makeView(on sceneId: SceneId) -> AnyView
+    func modify(on sceneId: SceneId, _ view: AnyView) -> AnyView
+}
+
+extension PresentedViewMaker {
+    func modify(on sceneId: SceneId, _ view: AnyView) -> AnyView {
+        return view
+    }
 }
 
 extension EmptyView: PresentedViewMaker {
