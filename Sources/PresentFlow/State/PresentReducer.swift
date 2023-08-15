@@ -33,14 +33,16 @@ enum PresentReducer {
             PresentMonitor.shared.record(event: .presentFailed(action.route, notFoundError))
             return
         }
-        if !action.viewMaker.canMakeView(on: state.sceneId) {
+        
+        var viewMaker = action.viewMaker
+        if !viewMaker.canMakeView(on: state.sceneId) {
             PresentMonitor.shared.record(event: .presentFailedNotRegister(action.route))
             return
         }
         var innerPresentState = InnerPresentState(level: baseOnLevel + 1,
                                                   route: action.route,
                                                   navigationState: action.navigationState,
-                                                  viewMaker: action.viewMaker)
+                                                  viewMaker: viewMaker)
         innerPresentState.isFrozen = action.isFrozen
         innerPresentState.isFullCover = action.isFullCover
         

@@ -11,49 +11,46 @@ import ViewFlow
 
 struct RegisteredPresentableViewMaker: PresentedViewMaker {
 
-    let routeData: ViewRouteData
+    let route: AnyViewRoute
+    var initData: Any
     
-    func canMakeView(on sceneId: SceneId) -> Bool {
+    init(routeData: ViewRouteData) {
+        self.init(route: routeData.route, initData: routeData.initData)
+    }
+    
+    init(route: AnyViewRoute, initData: Any) {
+        self.route = route
+        self.initData = initData
+    }
+    
+    mutating func canMakeView(on sceneId: SceneId) -> Bool {
         let presentCenter = Store<PresentState>.shared(on: sceneId).presentCenter
-        // 先查找外部界面构造器
-        if (presentCenter.externalManager ?? PresentCenter.shared.externalManager) != nil {
-            return true
-        }
-        
-        if (presentCenter.registerMap[routeData.route] ??
-            PresentCenter.shared.registerMap[routeData.route]) != nil {
-            return true
+        if let wrapper = presentCenter.registerMap[route] ?? PresentCenter.shared.registerMap[route] {
+            if let data = wrapper.check(initData) {
+                initData = data
+                return true
+            }
         }
         return false
     }
     
     func makeView(on sceneId: SceneId) -> AnyView {
         let presentCenter = Store<PresentState>.shared(on: sceneId).presentCenter
-        // 先查找外部界面构造器
-        if let externalManager = presentCenter.externalManager ??
-            PresentCenter.shared.externalManager {
-            return externalManager.viewMaker(routeData, sceneId)
-        }
-
-        if let wrapper = presentCenter.registerMap[routeData.route] ??
-            PresentCenter.shared.registerMap[routeData.route]{
-            return wrapper.makeView(routeData.initData)
+        if let wrapper = presentCenter.registerMap[route] ??
+            PresentCenter.shared.registerMap[route]{
+            return wrapper.makeView(initData)
         }
         
         // 这里需要记录异常
-        PresentMonitor.shared.fatalError("No registered presentable view for route '\(routeData.route.description)'")
-        return PresentNotFoundViewMaker(route: routeData.route).makeView(on: sceneId)
+        PresentMonitor.shared.fatalError("No registered presentable view for route '\(route.description)'")
+        return PresentNotFoundViewMaker(route: route).makeView(on: sceneId)
     }
     
     func modify(on sceneId: SceneId, _ view: AnyView) -> AnyView {
         let presentCenter = Store<PresentState>.shared(on: sceneId).presentCenter
-        // 先查找外部界面构造器
-        if let externalManager = presentCenter.externalManager ?? PresentCenter.shared.externalManager {
-            return externalManager.modifier(routeData.route, sceneId, view)
-        }
         
-        if let wrapper = presentCenter.registerMap[routeData.route] ??
-            PresentCenter.shared.registerMap[routeData.route] {
+        if let wrapper = presentCenter.registerMap[route] ??
+            PresentCenter.shared.registerMap[route] {
             return wrapper.modifier(view)
         }
         

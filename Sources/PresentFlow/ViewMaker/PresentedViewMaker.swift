@@ -10,7 +10,7 @@ import ViewFlow
 
 /// 展示界面的包装器，暂时内部使用
 protocol PresentedViewMaker {
-    func canMakeView(on sceneId: SceneId) -> Bool
+    mutating func canMakeView(on sceneId: SceneId) -> Bool
     func makeView(on sceneId: SceneId) -> AnyView
     func modify(on sceneId: SceneId, _ view: AnyView) -> AnyView
 }

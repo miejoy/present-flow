@@ -127,6 +127,31 @@ final class PresentStateTests: XCTestCase {
         XCTAssertEqual(PresentThirdView.getCall, true)
     }
     
+    func testPresentAnyRoute() throws {
+        let presentStore = Store<PresentState>.box(.init())
+        let view = FakeRootView(store: presentStore)
+        XCTAssertTrue(view.store === presentStore)
+        
+        XCTAssertEqual(presentStore.storage.innerPresentStores.count, 1)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[0].count, 1)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[0].first?.isPresenting, false)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[0].first?.isFullCoverPresenting, false)
+        
+        PresentThirdView.getCall = false
+        presentStore.send(action: .present(PresentThirdView.defaultRoute.eraseToAnyRoute()))
+        
+        // 判断 各层状态
+        XCTAssertEqual(presentStore.storage.innerPresentStores.count, 2)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[0].count, 1)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[0].first?.isPresenting, true)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[0].first?.isFullCoverPresenting, false)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[1].count, 1)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[1].first?.isPresenting, false)
+        XCTAssertEqual(presentStore.storage.innerPresentStores[1].first?.isFullCoverPresenting, false)
+        XCTAssertNotNil(presentStore.storage.innerPresentStores[1].first?.viewMaker as? RegisteredPresentableViewMaker)
+        XCTAssertEqual(PresentThirdView.getCall, true)
+    }
+    
     func testPresentFullCoverView() throws {
         let presentStore = Store<PresentState>.box(.init())
         let view = FakeRootView(store: presentStore)
@@ -608,9 +633,9 @@ final class PresentStateTests: XCTestCase {
         XCTAssertNotNil(presentStore.storage.innerPresentStores[1].first?.viewMaker as? PresentableViewMaker<PresentFirstView>)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[2].first?.viewMaker as? PresentableViewMaker<PresentSecondView>)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[3].first?.viewMaker as? RegisteredPresentableViewMaker)
-        XCTAssert((presentStore.storage.innerPresentStores[3].first?.viewMaker as? RegisteredPresentableViewMaker)?.routeData.initData is Void)
+        XCTAssert((presentStore.storage.innerPresentStores[3].first?.viewMaker as? RegisteredPresentableViewMaker)?.initData is Void)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[4].first?.viewMaker as? RegisteredPresentableViewMaker)
-        XCTAssert((presentStore.storage.innerPresentStores[4].first?.viewMaker as? RegisteredPresentableViewMaker)?.routeData.initData is Int)
+        XCTAssert((presentStore.storage.innerPresentStores[4].first?.viewMaker as? RegisteredPresentableViewMaker)?.initData is Int)
         
         presentStore.send(action: .dismissToViewOnLevel(1))
         
@@ -639,9 +664,9 @@ final class PresentStateTests: XCTestCase {
         XCTAssertNotNil(presentStore.storage.innerPresentStores[1].first?.viewMaker as? PresentableViewMaker<PresentFirstView>)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[2].first?.viewMaker as? PresentableViewMaker<PresentSecondView>)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[3].first?.viewMaker as? RegisteredPresentableViewMaker)
-        XCTAssert((presentStore.storage.innerPresentStores[3].first?.viewMaker as? RegisteredPresentableViewMaker)?.routeData.initData is Void)
+        XCTAssert((presentStore.storage.innerPresentStores[3].first?.viewMaker as? RegisteredPresentableViewMaker)?.initData is Void)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[4].first?.viewMaker as? RegisteredPresentableViewMaker)
-        XCTAssert((presentStore.storage.innerPresentStores[4].first?.viewMaker as? RegisteredPresentableViewMaker)?.routeData.initData is Int)
+        XCTAssert((presentStore.storage.innerPresentStores[4].first?.viewMaker as? RegisteredPresentableViewMaker)?.initData is Int)
         
         presentStore.send(action: .dismissToViewOnRoute(PresentSecondView.defaultRoute))
         
@@ -674,9 +699,9 @@ final class PresentStateTests: XCTestCase {
         XCTAssertNotNil(presentStore.storage.innerPresentStores[1].first?.viewMaker as? PresentableViewMaker<PresentFirstView>)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[2].first?.viewMaker as? PresentableViewMaker<PresentSecondView>)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[3].first?.viewMaker as? RegisteredPresentableViewMaker)
-        XCTAssert((presentStore.storage.innerPresentStores[3].first?.viewMaker as? RegisteredPresentableViewMaker)?.routeData.initData is Void)
+        XCTAssert((presentStore.storage.innerPresentStores[3].first?.viewMaker as? RegisteredPresentableViewMaker)?.initData is Void)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[4].first?.viewMaker as? RegisteredPresentableViewMaker)
-        XCTAssert((presentStore.storage.innerPresentStores[4].first?.viewMaker as? RegisteredPresentableViewMaker)?.routeData.initData is Int)
+        XCTAssert((presentStore.storage.innerPresentStores[4].first?.viewMaker as? RegisteredPresentableViewMaker)?.initData is Int)
         
         presentStore.dismissViewOnLevel(2)
         
@@ -705,9 +730,9 @@ final class PresentStateTests: XCTestCase {
         XCTAssertNotNil(presentStore.storage.innerPresentStores[1].first?.viewMaker as? PresentableViewMaker<PresentFirstView>)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[2].first?.viewMaker as? PresentableViewMaker<PresentSecondView>)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[3].first?.viewMaker as? RegisteredPresentableViewMaker)
-        XCTAssert((presentStore.storage.innerPresentStores[3].first?.viewMaker as? RegisteredPresentableViewMaker)?.routeData.initData is Void)
+        XCTAssert((presentStore.storage.innerPresentStores[3].first?.viewMaker as? RegisteredPresentableViewMaker)?.initData is Void)
         XCTAssertNotNil(presentStore.storage.innerPresentStores[4].first?.viewMaker as? RegisteredPresentableViewMaker)
-        XCTAssert((presentStore.storage.innerPresentStores[4].first?.viewMaker as? RegisteredPresentableViewMaker)?.routeData.initData is Int)
+        XCTAssert((presentStore.storage.innerPresentStores[4].first?.viewMaker as? RegisteredPresentableViewMaker)?.initData is Int)
         
         presentStore.send(action: .dismissViewOnRoute(PresentThirdView.defaultRoute))
         

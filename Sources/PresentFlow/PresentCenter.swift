@@ -16,17 +16,11 @@ public final class PresentCenter {
         let line: Int
     }
     
-    struct ExternalManager {
-        let viewMaker: (_ routeData: ViewRouteData, _ sceneId: SceneId) -> AnyView
-        let modifier: (_ route: AnyViewRoute, _ sceneId: SceneId, _ view: AnyView) -> AnyView
-    }
-    
     public static let shared: PresentCenter = .init()
     
     var registerMap: [AnyViewRoute: PresentableViewWrapper] = [:]
     var registerCallSet: Set<CallId> = []
     var presentedModifier: ((_ content: PresentedModifier.Content, _ sceneId: SceneId, _ level: UInt) -> AnyView)? = nil
-    var externalManager: ExternalManager? = nil
     
     /// 使用默认路由注册对应展示界面
     @inlinable
@@ -108,18 +102,12 @@ public final class PresentCenter {
             PresentMonitor.shared.fatalError("Duplicate registration of PresentableView '\(key)'")
         }
         registerMap[key] = .init(V.self, modifier)
-    }
-    
-    public func registerExternalViewMaker(_ viewMaker: @escaping (_ routeData: ViewRouteData, _ sceneId: SceneId) -> AnyView, modifier: @escaping(_ route: AnyViewRoute, _ sceneId: SceneId, _ view: AnyView) -> AnyView = { $2 }) {
-        if externalManager != nil {
-            PresentMonitor.shared.fatalError("Duplicate registration of External View Maker")
-        }
-        externalManager = .init(viewMaker: viewMaker, modifier: modifier)
     }
 }
 
 struct PresentableViewWrapper {
     
+    let check: (Any) -> Any?
     let run: (Any) -> AnyView
     let modifier: (AnyView) -> AnyView
     
@@ -132,24 +120,24 @@ struct PresentableViewWrapper {
     }
     
     init<V: PresentableView>(_ presentableViewType: V.Type, _ modifier: @escaping (AnyView) -> some View = { $0 }) {
-        self.modifier = { view in
-            let newView = modifier(view)
-            if let newView = newView as? AnyView {
-                return newView
+        self.check = { data in
+            if data is V.InitData {
+                return data
+            } else if let data = V.makeInitializeData(from: data) {
+                return data
             }
-            return AnyView(newView)
+            return nil
         }
         self.run = { data -> AnyView in
             if let data = data as? V.InitData {
+                return AnyView(V(data))
+            } else if let data = V.makeInitializeData(from: data) {
                 return AnyView(V(data))
             }
             // 这里需要记录异常
             PresentMonitor.shared.fatalError("Make presentable view '\(String(describing: V.self))' failed. Convert to initialization data of '\(String(describing: V.InitData.self))' failed")
             return AnyView(EmptyView())
         }
-    }
-    
-    init<V: PresentableView>(_ presentableViewType: V.Type, _ modifier: @escaping (AnyView) -> some View) where V.InitData == Void {
         self.modifier = { view in
             let newView = modifier(view)
             if let newView = newView as? AnyView {
@@ -157,8 +145,19 @@ struct PresentableViewWrapper {
             }
             return AnyView(newView)
         }
+    }
+    
+    init<V: PresentableView>(_ presentableViewType: V.Type, _ modifier: @escaping (AnyView) -> some View) where V.InitData == Void {
+        self.check = { _ in () }
         self.run = { _ in
             return AnyView(V(Void()))
+        }
+        self.modifier = { view in
+            let newView = modifier(view)
+            if let newView = newView as? AnyView {
+                return newView
+            }
+            return AnyView(newView)
         }
     }
     
