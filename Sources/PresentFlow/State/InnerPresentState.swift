@@ -53,27 +53,20 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
     func makeView(_ sceneId: SceneId, _ closeView: AnyView) -> AnyView {
         let presentStore = Store<PresentState>.shared(on: sceneId)
         var view = viewMaker.makeView(on: sceneId)
+        view = AnyView(view.environment(\.suggestNavTitle, navigationState?.navigationTitle))
         if let navigationState = navigationState {
-            if let navigationTitle = navigationState.navigationTitle {
-                let viewWithTitle = view.navigationTitle(navigationTitle)
-                #if os(iOS) || os(watchOS)
-                if #available(iOS 14.0, watchOS 8.0, *) {
-                    view = AnyView(viewWithTitle.navigationBarTitleDisplayMode(.inline))
-                } else {
-                    view = AnyView(viewWithTitle)
-                }
-                #else
-                view = AnyView(viewWithTitle)
-                #endif
-            }
-            
             #if os(iOS) || os(tvOS)
             if navigationState.needCloseButton {
-                view = AnyView(view.navigationBarItems(leading: Button(action: {
-                    presentStore.dismissViewOnLevel(level)
-                }, label: {
-                    closeView
-                })))
+                let toolbarView = view.toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button {
+                            presentStore.dismissViewOnLevel(level)
+                        } label: {
+                            closeView
+                        }
+                    }
+                }
+                view = AnyView(toolbarView)
             }
             #endif
         }
