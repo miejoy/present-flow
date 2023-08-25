@@ -29,7 +29,11 @@ struct RegisteredPresentableViewMaker: PresentedViewMaker {
             if let data = wrapper.check(initData) {
                 initData = data
                 return true
+            } else {
+                PresentMonitor.shared.record(event: .presentFailedCannotMakeInitData(route))
             }
+        } else {
+            PresentMonitor.shared.record(event: .presentFailedNotRegister(route))
         }
         return false
     }

@@ -36,7 +36,7 @@ enum PresentReducer {
         
         var viewMaker = action.viewMaker
         if !viewMaker.canMakeView(on: state.sceneId) {
-            PresentMonitor.shared.record(event: .presentFailedNotRegister(action.route))
+            PresentMonitor.shared.record(event: .presentFailedCannotMakeView(action.route))
             return
         }
         var innerPresentState = InnerPresentState(level: baseOnLevel + 1,
