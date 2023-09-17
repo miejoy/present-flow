@@ -152,6 +152,8 @@ final class PresentStateTests: XCTestCase {
         XCTAssertEqual(PresentThirdView.getCall, true)
     }
     
+    #if os(iOS) || os(tvOS) || os(watchOS)
+    
     func testPresentFullCoverView() throws {
         let presentStore = Store<PresentState>.box(.init())
         let view = FakeRootView(store: presentStore)
@@ -201,6 +203,8 @@ final class PresentStateTests: XCTestCase {
         XCTAssertNotNil(presentStore.storage.innerPresentStores[1].first?.viewMaker as? PresentableViewMaker<PresentFirstView>)
         XCTAssertEqual(PresentFirstView.getCall, true)
     }
+    
+    #endif
     
     func testPresentFullCoverRoute() throws {
         let presentStore = Store<PresentState>.box(.init())
