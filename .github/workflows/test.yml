@@ -22,6 +22,6 @@ jobs:
       run: xcodebuild -scheme present-flow test -destination "platform=iOS Simulator,name=iPhone 14 Pro Max,OS=latest" -derivedDataPath .build -enableCodeCoverage YES
     - name: Upload coverage reports
       uses: codecov/codecov-action@v3
-        with:
-          xcode: true
-          xcode_archive_path: ${{ env.RESULT_BUNDLE_PATH }}
+      with:
+        xcode: true
+        xcode_archive_path: ${{ env.RESULT_BUNDLE_PATH }}
