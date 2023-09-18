@@ -203,9 +203,7 @@ final class PresentStateTests: XCTestCase {
         XCTAssertNotNil(presentStore.storage.innerPresentStores[1].first?.viewMaker as? PresentableViewMaker<PresentFirstView>)
         XCTAssertEqual(PresentFirstView.getCall, true)
     }
-    
-    #endif
-    
+        
     func testPresentFullCoverRoute() throws {
         let presentStore = Store<PresentState>.box(.init())
         let view = FakeRootView(store: presentStore)
@@ -230,6 +228,8 @@ final class PresentStateTests: XCTestCase {
         XCTAssertNotNil(presentStore.storage.innerPresentStores[1].first?.viewMaker as? RegisteredPresentableViewMaker)
         XCTAssertEqual(PresentThirdView.getCall, true)
     }
+    
+    #endif
     
     func testPresentTwo() throws {
         let presentStore = Store<PresentState>.box(.init())
