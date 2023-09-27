@@ -10,7 +10,7 @@ import ViewFlow
 import SwiftUI
 
 // 展示流相关状态
-public struct PresentState: FullSceneSharableState {
+public struct PresentState: FullSceneWithIdSharableState {
     public typealias UpState = SceneState
     
     public typealias BindAction = PresentAction
@@ -39,12 +39,7 @@ public struct PresentState: FullSceneSharableState {
     
     let presentCenter: PresentCenter = .init()
     
-    // 必须要的，InitializableState 限制的
-    public init() {
-        self.init(on: .main)
-    }
-    
-    public init(on sceneId: SceneId) {
+    public init(sceneId: SceneId) {
         self.sceneId = sceneId
     }
     
