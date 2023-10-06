@@ -18,6 +18,8 @@ public struct PresentFlowView<Content: View>: View {
     @InnerPresentWrapper var presetingState: InnerPresentState
     
     @Environment(\.presentManager) var presentManager
+    /// 关闭按钮
+    @Environment(\.presentedCloseView) var closeView
     
     public init(@ViewBuilder content: () -> Content ) {
         self.init(level: 0, content: content)
@@ -33,10 +35,12 @@ public struct PresentFlowView<Content: View>: View {
         content
             .sheet(isPresented: $presetingState.binding(of: \.isPresenting)) {
                 PresentedView(level: level + 1)
+                    .environment(\.presentedCloseView, closeView)
             }
             #if os(iOS) || os(tvOS) || os(watchOS)
             .fullScreenCover(isPresented: $presetingState.binding(of: \.isFullCoverPresenting)) {
                 PresentedView(level: level + 1)
+                    .environment(\.presentedCloseView, closeView)
             }
             #endif
             .environment(\.presentManager, presentManager) // 减少内部使用时的调用次数
