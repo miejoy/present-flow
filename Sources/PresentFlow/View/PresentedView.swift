@@ -34,7 +34,8 @@ struct PresentedView: TrackableView {
             callback: presentManager.presentCenter.presentedModifier ?? PresentCenter.shared.presentedModifier)
         )
         .interactiveDismissDisabled(presetedState.isFrozen)
-        .onAppear {
+        // 这里 SwiftUI 的 onAppear 调用过早，目前只能借用 UIViewController 的 viewDidAppear
+        .onAppeared {
             if presentManager.state.storage.innerPresentStores.count > level
                 && presentManager.curLevel != level {
                 presentManager.apply(action: .didAppearOnLevel(level))
@@ -53,5 +54,37 @@ struct PresentedView: TrackableView {
     
     var trackId: String {
         "\(String(describing: Self.self))-\(level)"
+    }
+}
+
+
+extension View {
+    /// 在界面已经出现时调用，并且只调用一次
+    public func onAppeared(perform action: (() -> Void)? = nil ) -> some View {
+        self.overlay(UIKitAppeared(onAppeared: action).disabled(true))
+    }
+}
+
+private struct UIKitAppeared: UIViewControllerRepresentable {
+    let onAppeared: (() -> Void)?
+
+    func makeUIViewController(context: Context) -> AppearedViewController {
+        let vc = AppearedViewController()
+        vc.onAppeared = onAppeared
+        return vc
+    }
+
+    func updateUIViewController(_ controller: AppearedViewController, context: Context) {}
+
+    class AppearedViewController: UIViewController {
+        var onAppeared: (() -> Void)? = nil
+        var callBefore: Bool = false
+
+        override func viewDidAppear(_ animated: Bool) {
+            if !callBefore {
+                callBefore = true
+                onAppeared?()
+            }
+        }
     }
 }

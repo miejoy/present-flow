@@ -206,7 +206,9 @@ enum PresentReducer {
                 // 这里需要一层一层的 present
                 let prevIsFullCover = state.storage.innerPresentStores[Int(state.curLevel + 1)].first?.isFullCover ?? false
                 if let processStore = state.storage.innerPresentStores[Int(state.curLevel)].last {
-                    processStore.apply(action: .present(prevIsFullCover))
+                    if !processStore.isPresenting && !processStore.isFullCoverPresenting {
+                        processStore.apply(action: .present(prevIsFullCover))
+                    }
                 } else {
                     // 这里存在问题 fault
                     if state.curLevel == 0 {
