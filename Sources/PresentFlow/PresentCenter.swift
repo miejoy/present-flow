@@ -9,6 +9,9 @@ import Foundation
 import SwiftUI
 import ViewFlow
 
+/// 展示注册中心，
+/// 这里通过 shared 获取的注册中心，是注册整个App用到的展示界面
+/// 如果通过 PresentState 获取的注册中心，是针对当前 scene 注册展示界面，会有些从这里查找注册的界面，查找不到会从 App 的注册中心查找
 public final class PresentCenter {
     // 调用 ID，为了解决 SwifUI 中刷新界面时重复调用问题
     struct CallId: Hashable {

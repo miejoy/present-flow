@@ -9,19 +9,23 @@ on:
 jobs:
   build:
 
-    runs-on: macos-13
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v3
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.0.0'
+        xcode-version: 'latest-stable'
     - name: Build
-      run: xcodebuild -scheme present-flow build -destination "platform=iOS Simulator,name=iPhone 14 Pro Max,OS=latest" -derivedDataPath .build
+      run: xcodebuild -scheme present-flow build -destination "platform=iOS Simulator,name=iPhone 17 Pro Max,OS=latest" -derivedDataPath .build
     - name: Run tests
-      run: xcodebuild -scheme present-flow test -destination "platform=iOS Simulator,name=iPhone 14 Pro Max,OS=latest" -derivedDataPath .build -enableCodeCoverage YES
+      run: xcodebuild -scheme present-flow test -destination "platform=iOS Simulator,name=iPhone 17 Pro Max,OS=latest" -derivedDataPath .build -enableCodeCoverage YES
+    - name: Convert code coverage
+      run: xcrun llvm-cov export -format="lcov" -instr-profile=$(find .build -name Coverage.profdata) $(find .build -name '*.xctest')/*Tests > info.lcov
     - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
-        xcode: true
-        xcode_archive_path: ${{ env.RESULT_BUNDLE_PATH }}
+        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
+        verbose: true
+
