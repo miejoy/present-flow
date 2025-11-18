@@ -50,6 +50,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
         self.viewMaker = viewMaker
     }
     
+    @MainActor
     func makeView(_ sceneId: SceneId, _ closeView: AnyView) -> AnyView {
         let presentStore = Store<PresentState>.shared(on: sceneId)
         var view = viewMaker.makeView(on: sceneId)

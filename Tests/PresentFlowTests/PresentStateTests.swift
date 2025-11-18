@@ -15,6 +15,7 @@ import XCTViewFlow
 
 import Foundation
 
+@MainActor
 final class PresentStateTests: XCTestCase {
     
     override class func setUp() {
@@ -53,7 +54,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentView() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -78,7 +79,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentViewType() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -103,7 +104,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentRoute() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -128,7 +129,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentAnyRoute() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -155,7 +156,7 @@ final class PresentStateTests: XCTestCase {
     #if os(iOS) || os(tvOS) || os(watchOS)
     
     func testPresentFullCoverView() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -180,7 +181,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentFullCoverViewType() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -205,7 +206,7 @@ final class PresentStateTests: XCTestCase {
     }
         
     func testPresentFullCoverRoute() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -232,7 +233,7 @@ final class PresentStateTests: XCTestCase {
     #endif
     
     func testPresentTwo() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -264,7 +265,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentFour() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -322,7 +323,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentOnLevel() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -365,7 +366,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentOnLevelWithRoute() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -408,7 +409,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentOnRoute() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -451,7 +452,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentOnRouteWithView() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -481,7 +482,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentOnRouteWithVoidView() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -511,7 +512,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentOnRouteWithVoidRoute() throws {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -541,7 +542,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testPresentOnNotFound() {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -583,7 +584,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testDismiss() {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -602,7 +603,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testDismissToRoot() {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -623,7 +624,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testDismissToLevel() {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -654,7 +655,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testDismissToRoute() {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -689,7 +690,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testDismissViewOnLevel() {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -720,7 +721,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testDismissViewOnRoute() {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -766,7 +767,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testDismissNotFound() {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -800,7 +801,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testUserDismiss() {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -816,7 +817,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testFreeze() {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -859,7 +860,7 @@ final class PresentStateTests: XCTestCase {
     }
     
     func testFreezeNotFound() {
-        let presentStore = Store<PresentState>.box(.init())
+        let presentStore = Store<PresentState>.box(.init(), configs: [.make(.useBoxOnShared, true)])
         let view = FakeRootView(store: presentStore)
         XCTAssertTrue(view.store === presentStore)
         
@@ -906,6 +907,7 @@ class FakePresentedView {
     var presentingObserver: AnyCancellable? = nil
     var fullCoverPresentingObserver: AnyCancellable? = nil
     
+    @MainActor
     init(sceneId: SceneId, level: UInt, store: Store<PresentState>) {
         self.sceneId = sceneId
         self.level = level
@@ -950,6 +952,7 @@ class FakeRootView {
     
     var presentedView: FakePresentedView
     
+    @MainActor
     init(store: Store<PresentState>) {
         self.store = store
         self.presentedView = FakePresentedView(sceneId: .main, level: 0, store: store)

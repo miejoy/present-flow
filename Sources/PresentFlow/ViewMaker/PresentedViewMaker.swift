@@ -11,7 +11,9 @@ import ViewFlow
 /// 展示界面的包装器，暂时内部使用
 protocol PresentedViewMaker {
     mutating func canMakeView(on sceneId: SceneId) -> Bool
+    @MainActor
     func makeView(on sceneId: SceneId) -> AnyView
+    @MainActor
     func modify(on sceneId: SceneId, _ view: AnyView) -> AnyView
 }
 

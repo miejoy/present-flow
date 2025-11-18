@@ -111,8 +111,8 @@ public final class PresentCenter {
 struct PresentableViewWrapper {
     
     let check: (Any) -> Any?
-    let run: (Any) -> AnyView
-    let modifier: (AnyView) -> AnyView
+    let run: @MainActor (Any) -> AnyView
+    let modifier: @MainActor (AnyView) -> AnyView
     
     init<V: PresentableView>(_ presentableViewType: V.Type) {
         self.init(presentableViewType, { $0 })
@@ -164,6 +164,7 @@ struct PresentableViewWrapper {
         }
     }
     
+    @MainActor
     func makeView(_ data: Any) -> AnyView {
         return run(data)
     }

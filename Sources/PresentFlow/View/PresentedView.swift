@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  PresentedView.swift
+//
 //
 //  Created by 黄磊 on 2022/8/7.
 //
@@ -61,10 +61,16 @@ struct PresentedView: TrackableView {
 extension View {
     /// 在界面已经出现时调用，并且只调用一次
     public func onAppeared(perform action: (() -> Void)? = nil ) -> some View {
+        #if canImport(UIKit)
         self.overlay(UIKitAppeared(onAppeared: action).disabled(true))
+        #else
+        self.overlay(EmptyView())
+        #endif
     }
 }
 
+
+#if canImport(UIKit)
 private struct UIKitAppeared: UIViewControllerRepresentable {
     let onAppeared: (() -> Void)?
 
@@ -88,3 +94,4 @@ private struct UIKitAppeared: UIViewControllerRepresentable {
         }
     }
 }
+#endif // canImport(UIKit)

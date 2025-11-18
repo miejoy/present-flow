@@ -10,9 +10,9 @@ import SwiftUI
 import ViewFlow
 
 struct PresentableViewMaker<P: PresentableView> : PresentedViewMaker {
-    let makeView: () -> P
+    let makeView: @MainActor () -> P
     
-    init(makeView: @escaping () -> P) {
+    init(makeView: @MainActor @escaping () -> P) {
         self.makeView = makeView
     }
     

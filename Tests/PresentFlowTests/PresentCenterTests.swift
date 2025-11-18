@@ -132,6 +132,7 @@ final class PresentCenterTests: XCTestCase {
         ViewTest.releaseHost(host)
     }
     
+    @MainActor
     func testRegisterWithModifier() {
         PresentCenter.shared.registerMap = [:]
         let presentCenter = PresentCenter.shared
