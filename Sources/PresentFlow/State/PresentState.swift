@@ -28,30 +28,51 @@ public struct PresentState: FullSceneWithIdSharableState {
     
     /// 是否正在搜寻 turn 节点
     var isSeekingTurn: Bool = false
-        
-    /// InnerPresentState 存储器
-    final class PresentStorage {
-        /// 内部展示状态对应 store， 之所以用两层数组，是为了支持同时任意的 present 和 dismiss
-        var innerPresentStores: [[Store<InnerPresentState>]] = []
-    }
-    
-    let storage: PresentStorage = .init()
-    
-    let presentCenter: PresentCenter = .init()
     
     public init(sceneId: SceneId) {
         self.sceneId = sceneId
     }
     
     public static func loadReducers(on store: Store<PresentState>) {
-        store.registerDefault { state, action in
-            PresentReducer.reducer(&state, action)
+        store.registerDefault { [weak store] state, action in
+            guard let store = store else { return }
+            PresentReducer.reducer(store, &state, action)
         }
     }
 }
 
+// MARK: - PresentStorage
+
+/// InnerPresentState 存储器
+final class PresentStorage {
+    /// 内部展示状态对应 store， 之所以用两层数组，是为了支持同时任意的 present 和 dismiss
+    var innerPresentStores: [[Store<InnerPresentState>]] = []
+}
+
+extension StateOnStoreStorageKey where Value == PresentStorage, State == PresentState {
+    static let storage: Self = .init("storage")
+}
+
+extension Store where State == PresentState {
+    nonisolated var storage: PresentStorage {
+        self[.storage, default: PresentStorage()]
+    }
+}
+
+// MARK: - PresentCenter
+
+extension StateOnStoreStorageKey where Value == PresentCenter, State == PresentState {
+    static let presentCenter: Self = .init("presentCenter")
+}
+
+extension Store where State == PresentState {
+    nonisolated var presentCenter: PresentCenter {
+        self[.presentCenter, default: PresentCenter()]
+    }
+}
+
 /// store maker
-extension PresentState {
+extension Store where State == PresentState {
     /// 获取 Inner Present Store
     func innerPresentStoreOnLevel(_ level: UInt, _ createIfNeed: Bool = false) -> Store<InnerPresentState> {
         if level < storage.innerPresentStores.count {

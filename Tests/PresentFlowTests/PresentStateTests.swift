@@ -6,7 +6,7 @@
 //
 
 import XCTest
-import DataFlow
+@testable import DataFlow
 import ViewFlow
 import Combine
 import SwiftUI
@@ -551,7 +551,7 @@ final class PresentStateTests: XCTestCase {
         presentStore.send(action: .present(PresentThirdView.defaultRoute))
         
         PresentMonitor.shared.arrObservers = []
-        class Oberver: PresentMonitorOberver {
+        class Oberver: PresentMonitorObserver, @unchecked Sendable {
             var presentRoute: AnyViewRoute? = nil
             var presentOnNotFound: TargetRouteNotFound? = nil
             func receivePresentEvent(_ event: PresentEvent) {
@@ -776,7 +776,7 @@ final class PresentStateTests: XCTestCase {
         presentStore.send(action: .present(PresentThirdView.defaultRoute))
         
         PresentMonitor.shared.arrObservers = []
-        class Oberver: PresentMonitorOberver {
+        class Oberver: PresentMonitorObserver, @unchecked Sendable {
             var dismissNotFound: TargetRouteNotFound? = nil
             func receivePresentEvent(_ event: PresentEvent) {
                 if case .dismissFailed(let notFound)  = event {
@@ -869,7 +869,7 @@ final class PresentStateTests: XCTestCase {
         presentStore.send(action: .present(PresentThirdView.defaultRoute))
         
         PresentMonitor.shared.arrObservers = []
-        class Oberver: PresentMonitorOberver {
+        class Oberver: PresentMonitorObserver, @unchecked Sendable {
             var freezeNotFound: TargetRouteNotFound? = nil
             var unfreezeNotFound: TargetRouteNotFound? = nil
             func receivePresentEvent(_ event: PresentEvent) {
@@ -912,7 +912,7 @@ class FakePresentedView {
         self.sceneId = sceneId
         self.level = level
         self.store = store
-        self.innerStore = store.state.innerPresentStoreOnLevel(level, level == 0)
+        self.innerStore = store.innerPresentStoreOnLevel(level, level == 0)
         self.presentingObserver = self.innerStore.addObserver(of: \.isPresenting) { [weak self] new, old in
             guard let self = self else {
                 return

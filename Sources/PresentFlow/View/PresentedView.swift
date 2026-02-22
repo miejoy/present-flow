@@ -36,7 +36,7 @@ struct PresentedView: TrackableView {
         .interactiveDismissDisabled(presetedState.isFrozen)
         // 这里 SwiftUI 的 onAppear 调用过早，目前只能借用 UIViewController 的 viewDidAppear
         .onAppeared {
-            if presentManager.state.storage.innerPresentStores.count > level
+            if presentManager.storage.innerPresentStores.count > level
                 && presentManager.curLevel != level {
                 presentManager.apply(action: .didAppearOnLevel(level))
             }
@@ -44,7 +44,7 @@ struct PresentedView: TrackableView {
         .onDisappear {
             // 这里需要读取 上一层 presentingStore 是否真的不展示了，避免多销毁了 store。
             // 在展示全屏的 UIViewController 时，最上层的 SwiftUI 界面都会 Disapper
-            let presentingStore = presentManager.state.innerPresentStoreOnLevel(level - 1)
+            let presentingStore = presentManager.innerPresentStoreOnLevel(level - 1)
             if !(presentingStore.isPresenting || presentingStore.isFullCoverPresenting) {
                 presentManager.apply(action: .didDisappearOnLevel(level))
             }

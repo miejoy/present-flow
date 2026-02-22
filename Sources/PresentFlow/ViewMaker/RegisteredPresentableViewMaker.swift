@@ -9,7 +9,7 @@ import SwiftUI
 import DataFlow
 import ViewFlow
 
-struct RegisteredPresentableViewMaker: PresentedViewMaker {
+struct RegisteredPresentableViewMaker: PresentedViewMaker, @unchecked Sendable {
 
     let route: AnyViewRoute
     var initData: Any
@@ -38,6 +38,7 @@ struct RegisteredPresentableViewMaker: PresentedViewMaker {
         return false
     }
     
+    @MainActor
     func makeView(on sceneId: SceneId) -> AnyView {
         let presentCenter = Store<PresentState>.shared(on: sceneId).presentCenter
         if let wrapper = presentCenter.registerMap[route] ??
@@ -50,6 +51,7 @@ struct RegisteredPresentableViewMaker: PresentedViewMaker {
         return PresentNotFoundViewMaker(route: route).makeView(on: sceneId)
     }
     
+    @MainActor
     func modify(on sceneId: SceneId, _ view: AnyView) -> AnyView {
         let presentCenter = Store<PresentState>.shared(on: sceneId).presentCenter
         

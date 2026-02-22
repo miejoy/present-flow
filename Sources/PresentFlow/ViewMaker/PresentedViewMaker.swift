@@ -9,7 +9,7 @@ import SwiftUI
 import ViewFlow
 
 /// 展示界面的包装器，暂时内部使用
-protocol PresentedViewMaker {
+protocol PresentedViewMaker: Sendable {
     mutating func canMakeView(on sceneId: SceneId) -> Bool
     @MainActor
     func makeView(on sceneId: SceneId) -> AnyView

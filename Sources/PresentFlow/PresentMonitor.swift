@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import ViewFlow
+import DataFlow
 
 public enum TargetRouteNotFound: Equatable, CustomStringConvertible {
     case route(AnyViewRoute)
@@ -24,7 +25,7 @@ public enum TargetRouteNotFound: Equatable, CustomStringConvertible {
 }
 
 /// 存储器变化事件
-public enum PresentEvent {
+public enum PresentEvent: MonitorEvent {
     case presentFailed(AnyViewRoute, TargetRouteNotFound)
     case presentFailedNotRegister(AnyViewRoute)
     case presentFailedCannotMakeInitData(AnyViewRoute)
@@ -35,56 +36,25 @@ public enum PresentEvent {
     case fatalError(String)
 }
 
-public protocol PresentMonitorOberver: AnyObject {
+public protocol PresentMonitorObserver: MonitorObserver {
     func receivePresentEvent(_ event: PresentEvent)
 }
 
-/// 存储器监听器
-public final class PresentMonitor {
-        
-    struct Observer {
-        let observerId: Int
-        weak var observer: PresentMonitorOberver?
-    }
-    
-    /// 监听器共享单例
-    public static var shared: PresentMonitor = .init()
-    
-    /// 所有观察者
-    var arrObservers: [Observer] = []
-    var generateObserverId: Int = 0
-    
-    required init() {
-    }
-    
-    /// 添加观察者
-    public func addObserver(_ observer: PresentMonitorOberver) -> AnyCancellable {
-        generateObserverId += 1
-        let observerId = generateObserverId
-        arrObservers.append(.init(observerId: generateObserverId, observer: observer))
-        return AnyCancellable { [weak self] in
-            if let index = self?.arrObservers.firstIndex(where: { $0.observerId == observerId}) {
-                self?.arrObservers.remove(at: index)
+/// 暂时监听器
+public final class PresentMonitor: BaseMonitor<PresentEvent> {
+    public nonisolated(unsafe) static let shared: PresentMonitor = {
+        PresentMonitor { event, observer in
+            DispatchQueue.executeOnMain {
+                (observer as? PresentMonitorObserver)?.receivePresentEvent(event)
             }
         }
+    }()
+
+    public func addObserver(_ observer: PresentMonitorObserver) -> AnyCancellable {
+        super.addObserver(observer)
     }
-    
-    /// 记录对应事件，这里只负责将所有事件传递给观察者
-    @usableFromInline
-    func record(event: PresentEvent) {
-        guard !arrObservers.isEmpty else { return }
-        arrObservers.forEach { $0.observer?.receivePresentEvent(event) }
-    }
-    
-    @usableFromInline
-    func fatalError(_ message: String) {
-        guard !arrObservers.isEmpty else {
-            #if DEBUG
-            Swift.fatalError(message)
-            #else
-            return
-            #endif
-        }
-        arrObservers.forEach { $0.observer?.receivePresentEvent(.fatalError(message)) }
+
+    public override func addObserver(_ observer: MonitorObserver) -> AnyCancellable {
+        Swift.fatalError("Only PresentMonitorObserver can observer this monitor")
     }
 }

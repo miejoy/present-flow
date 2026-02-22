@@ -12,6 +12,7 @@ import SwiftUI
 @testable import PresentFlow
 import XCTViewFlow
 
+@MainActor
 final class PresentCenterTests: XCTestCase {
     
     let defaultViewRouteId: String = "__default__"

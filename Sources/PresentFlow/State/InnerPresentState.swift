@@ -93,8 +93,9 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
     }
 }
 
+@MainActor
 @propertyWrapper
-struct InnerPresentWrapper : DynamicProperty {
+struct InnerPresentWrapper : @preconcurrency DynamicProperty {
     
     @ObservedObject
     var storage: InnerPresentWrapperStorage
@@ -126,6 +127,7 @@ struct InnerPresentWrapper : DynamicProperty {
     }
 }
 
+@MainActor
 final class InnerPresentWrapperStorage: ObservableObject {
     let level: UInt
     @Published
@@ -139,7 +141,7 @@ final class InnerPresentWrapperStorage: ObservableObject {
     
     func configIfNeed(_ sceneId: SceneId) {
         if store == nil {
-            let newStore = Store<PresentState>.shared(on: sceneId).state.innerPresentStoreOnLevel(level, level == 0)
+            let newStore = Store<PresentState>.shared(on: sceneId).innerPresentStoreOnLevel(level, level == 0)
             self.cancellable = newStore.addObserver { [weak self] new, old in
                 self?.refreshTrigger.toggle()
             }
