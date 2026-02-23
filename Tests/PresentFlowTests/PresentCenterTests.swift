@@ -118,7 +118,7 @@ final class PresentCenterTests: XCTestCase {
         var callbackSceneId: SceneId? = nil
         var callbackLevel: UInt? = nil
         
-        let view = PresentedModifiterTestView {
+        let view = PresentedModifierTestView {
             callbackSceneId = $0
             callbackLevel = $1
         }
@@ -200,7 +200,7 @@ final class PresentCenterTests: XCTestCase {
 }
 
 
-struct PresentedModifiterTestView: View {
+struct PresentedModifierTestView: View {
     
     let callback: (_ sceneId: SceneId, _ level: UInt) -> Void
     

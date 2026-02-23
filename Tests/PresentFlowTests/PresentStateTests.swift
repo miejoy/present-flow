@@ -242,7 +242,7 @@ final class PresentStateTests: XCTestCase {
         XCTAssertEqual(presentStore.storage.innerPresentStores[0].first?.isPresenting, false)
         XCTAssertEqual(presentStore.storage.innerPresentStores[0].first?.isFullCoverPresenting, false)
         
-        let secondData: String = "sencond"
+        let secondData: String = "second"
         PresentFirstView.getCall = false
         PresentSecondView.getCall = false
         presentStore.present(PresentFirstView.self)
@@ -551,7 +551,7 @@ final class PresentStateTests: XCTestCase {
         presentStore.send(action: .present(PresentThirdView.defaultRoute))
         
         PresentMonitor.shared.arrObservers = []
-        class Oberver: PresentMonitorObserver, @unchecked Sendable {
+        class Observer: PresentMonitorObserver, @unchecked Sendable {
             var presentRoute: AnyViewRoute? = nil
             var presentOnNotFound: TargetRouteNotFound? = nil
             func receivePresentEvent(_ event: PresentEvent) {
@@ -561,24 +561,24 @@ final class PresentStateTests: XCTestCase {
                 }
             }
         }
-        let oberver = Oberver()
-        let cancellable = PresentMonitor.shared.addObserver(oberver)
+        let observer = Observer()
+        let cancellable = PresentMonitor.shared.addObserver(observer)
         
-        XCTAssertNil(oberver.presentRoute)
-        XCTAssertNil(oberver.presentOnNotFound)
+        XCTAssertNil(observer.presentRoute)
+        XCTAssertNil(observer.presentOnNotFound)
         presentStore.send(action: .present(PresentFourthView.self, 0, baseOnLevel: 4))
-        XCTAssertNotNil(oberver.presentRoute)
-        XCTAssertNotNil(oberver.presentOnNotFound)
-        XCTAssertEqual(oberver.presentRoute, PresentFourthView.defaultRoute.eraseToAnyRoute())
-        XCTAssertEqual(oberver.presentOnNotFound, .level(4))
+        XCTAssertNotNil(observer.presentRoute)
+        XCTAssertNotNil(observer.presentOnNotFound)
+        XCTAssertEqual(observer.presentRoute, PresentFourthView.defaultRoute.eraseToAnyRoute())
+        XCTAssertEqual(observer.presentOnNotFound, .level(4))
         
-        oberver.presentRoute = nil
-        oberver.presentOnNotFound = nil
+        observer.presentRoute = nil
+        observer.presentOnNotFound = nil
         presentStore.send(action: .present(PresentFourthView.self, 0, baseOnRoute: PresentFourthView.defaultRoute))
-        XCTAssertNotNil(oberver.presentRoute)
-        XCTAssertNotNil(oberver.presentOnNotFound)
-        XCTAssertEqual(oberver.presentRoute, PresentFourthView.defaultRoute.eraseToAnyRoute())
-        XCTAssertEqual(oberver.presentOnNotFound, .route(PresentFourthView.defaultRoute.eraseToAnyRoute()))
+        XCTAssertNotNil(observer.presentRoute)
+        XCTAssertNotNil(observer.presentOnNotFound)
+        XCTAssertEqual(observer.presentRoute, PresentFourthView.defaultRoute.eraseToAnyRoute())
+        XCTAssertEqual(observer.presentOnNotFound, .route(PresentFourthView.defaultRoute.eraseToAnyRoute()))
         
         cancellable.cancel()
     }
@@ -776,7 +776,7 @@ final class PresentStateTests: XCTestCase {
         presentStore.send(action: .present(PresentThirdView.defaultRoute))
         
         PresentMonitor.shared.arrObservers = []
-        class Oberver: PresentMonitorObserver, @unchecked Sendable {
+        class Observer: PresentMonitorObserver, @unchecked Sendable {
             var dismissNotFound: TargetRouteNotFound? = nil
             func receivePresentEvent(_ event: PresentEvent) {
                 if case .dismissFailed(let notFound)  = event {
@@ -784,18 +784,18 @@ final class PresentStateTests: XCTestCase {
                 }
             }
         }
-        let oberver = Oberver()
-        let cancellable = PresentMonitor.shared.addObserver(oberver)
+        let observer = Observer()
+        let cancellable = PresentMonitor.shared.addObserver(observer)
         
-        XCTAssertNil(oberver.dismissNotFound)
+        XCTAssertNil(observer.dismissNotFound)
         presentStore.send(action: .dismissViewOnLevel(4))
-        XCTAssertNotNil(oberver.dismissNotFound)
-        XCTAssertEqual(oberver.dismissNotFound, TargetRouteNotFound.level(4))
+        XCTAssertNotNil(observer.dismissNotFound)
+        XCTAssertEqual(observer.dismissNotFound, TargetRouteNotFound.level(4))
         
-        oberver.dismissNotFound = nil
+        observer.dismissNotFound = nil
         presentStore.send(action: .dismissViewOnRoute(PresentFourthView.defaultRoute))
-        XCTAssertNotNil(oberver.dismissNotFound)
-        XCTAssertEqual(oberver.dismissNotFound, TargetRouteNotFound.route(PresentFourthView.defaultRoute.eraseToAnyRoute()))
+        XCTAssertNotNil(observer.dismissNotFound)
+        XCTAssertEqual(observer.dismissNotFound, TargetRouteNotFound.route(PresentFourthView.defaultRoute.eraseToAnyRoute()))
         
         cancellable.cancel()
     }
@@ -869,7 +869,7 @@ final class PresentStateTests: XCTestCase {
         presentStore.send(action: .present(PresentThirdView.defaultRoute))
         
         PresentMonitor.shared.arrObservers = []
-        class Oberver: PresentMonitorObserver, @unchecked Sendable {
+        class Observer: PresentMonitorObserver, @unchecked Sendable {
             var freezeNotFound: TargetRouteNotFound? = nil
             var unfreezeNotFound: TargetRouteNotFound? = nil
             func receivePresentEvent(_ event: PresentEvent) {
@@ -880,18 +880,18 @@ final class PresentStateTests: XCTestCase {
                 }
             }
         }
-        let oberver = Oberver()
-        let cancellable = PresentMonitor.shared.addObserver(oberver)
+        let observer = Observer()
+        let cancellable = PresentMonitor.shared.addObserver(observer)
         
-        XCTAssertNil(oberver.freezeNotFound)
+        XCTAssertNil(observer.freezeNotFound)
         presentStore.send(action: .freezeViewOnLevel(4))
-        XCTAssertNotNil(oberver.freezeNotFound)
-        XCTAssertEqual(oberver.freezeNotFound, TargetRouteNotFound.level(4))
+        XCTAssertNotNil(observer.freezeNotFound)
+        XCTAssertEqual(observer.freezeNotFound, TargetRouteNotFound.level(4))
         
-        XCTAssertNil(oberver.unfreezeNotFound)
+        XCTAssertNil(observer.unfreezeNotFound)
         presentStore.send(action: .unfreezeViewOnRoute(PresentFourthView.defaultRoute))
-        XCTAssertNotNil(oberver.unfreezeNotFound)
-        XCTAssertEqual(oberver.unfreezeNotFound, TargetRouteNotFound.route(PresentFourthView.defaultRoute.eraseToAnyRoute()))
+        XCTAssertNotNil(observer.unfreezeNotFound)
+        XCTAssertEqual(observer.unfreezeNotFound, TargetRouteNotFound.route(PresentFourthView.defaultRoute.eraseToAnyRoute()))
         
         cancellable.cancel()
     }

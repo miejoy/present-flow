@@ -10,7 +10,7 @@ import Combine
 import ViewFlow
 import DataFlow
 
-public enum TargetRouteNotFound: Equatable, CustomStringConvertible {
+public enum TargetRouteNotFound: Equatable, CustomStringConvertible, Sendable {
     case route(AnyViewRoute)
     case level(UInt)
     
@@ -24,7 +24,7 @@ public enum TargetRouteNotFound: Equatable, CustomStringConvertible {
     }
 }
 
-/// 存储器变化事件
+/// 展示器变化事件
 public enum PresentEvent: MonitorEvent {
     case presentFailed(AnyViewRoute, TargetRouteNotFound)
     case presentFailedNotRegister(AnyViewRoute)
@@ -36,11 +36,12 @@ public enum PresentEvent: MonitorEvent {
     case fatalError(String)
 }
 
+/// 展示监听器观察者
 public protocol PresentMonitorObserver: MonitorObserver {
     func receivePresentEvent(_ event: PresentEvent)
 }
 
-/// 暂时监听器
+/// 展示监听器
 public final class PresentMonitor: BaseMonitor<PresentEvent> {
     public nonisolated(unsafe) static let shared: PresentMonitor = {
         PresentMonitor { event, observer in

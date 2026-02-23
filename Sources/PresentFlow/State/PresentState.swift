@@ -84,7 +84,7 @@ extension Store where State == PresentState {
         if createIfNeed {
             while level >= storage.innerPresentStores.count {
                 if level == storage.innerPresentStores.count {
-                    // 这里一般时第一层
+                    // 这里一般是第一层
                     let newState = InnerPresentState(level: level)
                     newStore = Store<InnerPresentState>.box(newState)
                     storage.innerPresentStores.append([newStore!])

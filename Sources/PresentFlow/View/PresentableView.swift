@@ -12,5 +12,6 @@ import SwiftUI
 public protocol PresentableView: RoutableView {
 }
 
+/// 可用于展示的无需参数初始化的界面
 public protocol VoidPresentableView: PresentableView, VoidInitializableView {
 }

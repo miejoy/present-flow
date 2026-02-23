@@ -81,7 +81,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnLevel: 基于那一层展示界面，这个层级必须小于等于展示流的最顶层层级
     /// - Returns Self: 返回构造好的自己
     public static func present<P: PresentableView>(
@@ -109,7 +109,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnRoute: 基于那一个路由展示界面，这个路由对应界面必须在展示流中存在
     /// - Returns Self: 返回构造好的自己
     public static func present<P: PresentableView, BaseOnInitData>(
@@ -165,7 +165,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnLevel: 基于那一层展示界面，这个层级必须小于等于展示流的最顶层层级
     /// - Returns Self: 返回构造好的自己
     public static func present<P: PresentableView>(
@@ -195,7 +195,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnRoute: 基于那一个路由展示界面，这个路由对应界面必须在展示流中存在
     /// - Returns Self: 返回构造好的自己
     public static func present<P: PresentableView, BaseOnInitData>(
@@ -224,7 +224,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnLevel: 基于那一层展示界面，这个层级必须小于等于展示流的最顶层层级
     /// - Returns Self: 返回构造好的自己
     public static func present<P: VoidPresentableView>(
@@ -252,7 +252,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnRoute: 基于那一个路由展示界面，这个路由对应界面必须在展示流中存在
     /// - Returns Self: 返回构造好的自己
     public static func present<P: VoidPresentableView, BaseOnInitData>(
@@ -308,7 +308,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnLevel: 基于那一层展示界面，这个层级必须小于等于展示流的最顶层层级
     /// - Returns Self: 返回构造好的自己
     public static func present<InitData>(
@@ -338,7 +338,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnRoute: 基于那一个路由展示界面，这个路由对应界面必须在展示流中存在
     /// - Returns Self: 返回构造好的自己
     public static func present<InitData, BaseOnInitData>(
@@ -367,7 +367,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnLevel: 基于那一层展示界面，这个层级必须小于等于展示流的最顶层层级
     /// - Returns Self: 返回构造好的自己
     public static func present(
@@ -395,7 +395,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnRoute: 基于那一个路由展示界面，这个路由对应界面必须在展示流中存在
     /// - Returns Self: 返回构造好的自己
     public static func present<BaseOnInitData>(
@@ -438,7 +438,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnLevel: 基于那一层展示界面，这个层级必须小于等于展示流的最顶层层级
     /// - Returns Self: 返回构造好的自己
     public static func present(
@@ -465,7 +465,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnRoute: 基于那一个路由展示界面，这个路由对应界面必须在展示流中存在
     /// - Returns Self: 返回构造好的自己
     public static func present<BaseOnInitData>(
@@ -520,7 +520,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnLevel: 基于那一层展示界面，这个层级必须小于等于展示流的最顶层层级
     /// - Returns Self: 返回构造好的自己
     public static func present(
@@ -550,7 +550,7 @@ extension PresentAction {
     /// - Parameter navTitle: 导航栏标题，如果非空则添加导航栏。默认不设置
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
-    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台剩下。默认 false
+    /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnRoute: 基于那一个路由展示界面，这个路由对应界面必须在展示流中存在
     /// - Returns Self: 返回构造好的自己
     public static func present<BaseOnInitData>(
