@@ -38,6 +38,7 @@ public enum PresentEvent: MonitorEvent {
 
 /// 展示监听器观察者
 public protocol PresentMonitorObserver: MonitorObserver {
+    @MainActor
     func receivePresentEvent(_ event: PresentEvent)
 }
 
