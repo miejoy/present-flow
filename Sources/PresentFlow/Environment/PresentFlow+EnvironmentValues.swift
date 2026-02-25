@@ -23,7 +23,7 @@ extension EnvironmentValues {
     }
     
     /// 导航栏左侧关闭按钮
-    public var presentedCloseView: AnyView {
+    public var presentedCloseView: any View {
         get { self[PresentedCloseViewKey.self] }
         set { self[PresentedCloseViewKey.self] = newValue }
     }
@@ -41,6 +41,6 @@ struct PresentLevelKey: EnvironmentKey {
 
 /// 展示的界面导航关闭按钮
 struct PresentedCloseViewKey: EnvironmentKey {
-    static let defaultValue: AnyView = AnyView(Image(systemName: "multiply.circle.fill").foregroundColor(Color.gray)
-        .frame(width: 30, height: 44))
+    static let defaultValue: any View = Image(systemName: "multiply.circle.fill").foregroundColor(Color.gray)
+        .frame(width: 30, height: 44)
 }

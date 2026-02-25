@@ -7,13 +7,13 @@ PresentFlow 是自定义 RSV(Resource & State & View) 设计模式中 State 层�
 [![Swift](https://github.com/miejoy/present-flow/actions/workflows/test.yml/badge.svg)](https://github.com/miejoy/present-flow/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/miejoy/present-flow/branch/main/graph/badge.svg)](https://codecov.io/gh/miejoy/present-flow)
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
-[![Swift](https://img.shields.io/badge/swift-5.4-brightgreen.svg)](https://swift.org)
+[![Swift](https://img.shields.io/badge/swift-6.2-brightgreen.svg)](https://swift.org)
 
 ## 依赖
 
 - iOS 15.0+ / macOS 12+
-- Xcode 14.0+
-- Swift 5.6+
+- Xcode 26.0+
+- Swift 6.2+
 
 ## 简介
 

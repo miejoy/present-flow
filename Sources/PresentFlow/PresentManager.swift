@@ -18,7 +18,7 @@ extension Store where State == PresentState {
     /// - Parameter view: 需要展示的界面
     /// - Parameter data: 初始化展示界面需要的数据
     @inlinable
-    public func present<P: PresentableView>(_ view: P) {
+    public func present<P: PresentableView & Sendable>(_ view: P) {
         self.send(action: .present(view))
     }
     
@@ -110,7 +110,7 @@ extension Store where State == PresentState {
     /// - Parameter view: 需要展示的界面类型
     /// - Parameter data: 初始化展示界面需要的数据
     @inlinable
-    public func presentFullCover<P: PresentableView>(_ view: P) {
+    public func presentFullCover<P: PresentableView & Sendable>(_ view: P) {
         self.send(action: .present(view, isFullCover: true))
     }
     

@@ -8,8 +8,9 @@
 import Foundation
 import Combine
 import ViewFlow
-import DataFlow
+import ModuleMonitor
 
+/// 对应路由未找到
 public enum TargetRouteNotFound: Equatable, CustomStringConvertible, Sendable {
     case route(AnyViewRoute)
     case level(UInt)
@@ -43,14 +44,14 @@ public protocol PresentMonitorObserver: MonitorObserver {
 }
 
 /// 展示监听器
-public final class PresentMonitor: BaseMonitor<PresentEvent> {
-    public nonisolated(unsafe) static let shared: PresentMonitor = {
+public final class PresentMonitor: ModuleMonitor<PresentEvent>, @unchecked Sendable {
+    public static let shared: PresentMonitor = DispatchQueue.syncOnMonitorQueue {
         PresentMonitor { event, observer in
             DispatchQueue.executeOnMain {
                 (observer as? PresentMonitorObserver)?.receivePresentEvent(event)
             }
         }
-    }()
+    }
 
     public func addObserver(_ observer: PresentMonitorObserver) -> AnyCancellable {
         super.addObserver(observer)

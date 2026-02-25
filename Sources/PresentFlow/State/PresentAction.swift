@@ -84,7 +84,7 @@ extension PresentAction {
     /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnLevel: 基于某一层展示界面，这个层级必须小于等于展示流的最顶层层级
     /// - Returns Self: 返回构造好的自己
-    public static func present<P: PresentableView>(
+    public static func present<P: PresentableView & Sendable>(
         _ view: P,
         navTitle: String? = nil,
         needCloseButton: Bool = false,
@@ -112,7 +112,7 @@ extension PresentAction {
     /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
     /// - Parameter baseOnRoute: 基于某一个路由展示界面，这个路由对应界面必须在展示流中存在
     /// - Returns Self: 返回构造好的自己
-    public static func present<P: PresentableView, BaseOnInitData>(
+    public static func present<P: PresentableView & Sendable, BaseOnInitData>(
         _ view: P,
         navTitle: String? = nil,
         needCloseButton: Bool = false,
@@ -131,7 +131,7 @@ extension PresentAction {
     }
     
     /// 展示对应界面，内部使用
-    static func present<P: PresentableView>(
+    static func present<P: PresentableView & Sendable>(
         _ view: P,
         navTitle: String? = nil,
         needCloseButton: Bool = false,

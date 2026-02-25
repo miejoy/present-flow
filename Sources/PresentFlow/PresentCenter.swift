@@ -19,11 +19,39 @@ public final class PresentCenter {
         let line: Int
     }
     
-    public static let shared: PresentCenter = .init()
+    class Storage {
+        var registerMap: [AnyViewRoute: PresentableViewWrapper] = [:]
+        var registerCallSet: Set<CallId> = []
+        var presentedModifier: ((_ content: PresentedModifier.Content, _ sceneId: SceneId, _ level: UInt) -> AnyView)? = nil
+    }
     
-    var registerMap: [AnyViewRoute: PresentableViewWrapper] = [:]
-    var registerCallSet: Set<CallId> = []
-    var presentedModifier: ((_ content: PresentedModifier.Content, _ sceneId: SceneId, _ level: UInt) -> AnyView)? = nil
+    nonisolated(unsafe) static var _shared: PresentCenter? = nil
+    nonisolated(unsafe) public static let shared: PresentCenter = {
+        DispatchQueue.syncOnStoreQueue {
+            if let exist = _shared {
+                return exist
+            }
+            let new = PresentCenter()
+            _shared = new
+            return new
+        }
+    }()
+    
+    let storage: Storage = .init()
+    
+    var registerMap: [AnyViewRoute: PresentableViewWrapper] {
+        get { DispatchQueue.syncOnStoreQueue { storage.registerMap } }
+        set { DispatchQueue.syncOnStoreQueue { storage.registerMap = newValue } }
+    }
+    var registerCallSet: Set<CallId> {
+        get { DispatchQueue.syncOnStoreQueue { storage.registerCallSet } }
+        set { DispatchQueue.syncOnStoreQueue { storage.registerCallSet = newValue } }
+    }
+    var presentedModifier: ((_ content: PresentedModifier.Content, _ sceneId: SceneId, _ level: UInt) -> AnyView)? {
+        get { DispatchQueue.syncOnStoreQueue { storage.presentedModifier } }
+        set { DispatchQueue.syncOnStoreQueue { storage.presentedModifier = newValue } }
+    }
+
     
     /// 使用默认路由注册对应展示界面
     @inlinable
@@ -47,7 +75,7 @@ public final class PresentCenter {
     @inlinable
     public func registerDefaultPresentableView<V: PresentableView>(
         _ presentableViewType: V.Type,
-        _ modifier: @escaping (AnyView) -> some View
+        _ modifier: @Sendable @escaping (AnyView) -> some View
     ) {
         let route = V.defaultRoute
         registerPresentableView(V.self, for: route, modifier)
@@ -57,7 +85,7 @@ public final class PresentCenter {
     @inlinable
     public func registerDefaultPresentableView<V: PresentableView>(
         _ presentableViewType: V.Type,
-        _ modifier: @escaping (AnyView) -> some View
+        _ modifier: @Sendable @escaping (AnyView) -> some View
     ) where V.InitData == Void {
         let route = V.defaultRoute
         registerPresentableView(V.self, for: route, modifier)
@@ -85,26 +113,30 @@ public final class PresentCenter {
     public func registerPresentableView<V: PresentableView>(
         _ presentableViewType: V.Type,
         for route: ViewRoute<V.InitData>,
-        _ modifier: @escaping (AnyView) -> some View
+        _ modifier: @Sendable @escaping (AnyView) -> some View
     ) {
-        let key = route.eraseToAnyRoute()
-        if registerMap[key] != nil {
-            PresentMonitor.shared.fatalError("Duplicate registration of PresentableView '\(key)'")
+        DispatchQueue.syncOnStoreQueue {
+            let key = route.eraseToAnyRoute()
+            if registerMap[key] != nil {
+                PresentMonitor.shared.fatalError("Duplicate registration of PresentableView '\(key)'")
+            }
+            registerMap[key] = .init(V.self, modifier)
         }
-        registerMap[key] = .init(V.self, modifier)
     }
     
     /// 注册对应展示界面
     public func registerPresentableView<V: PresentableView>(
         _ presentableViewType: V.Type,
         for route: ViewRoute<V.InitData>,
-        _ modifier: @escaping (AnyView) -> some View
+        _ modifier: @Sendable @escaping (AnyView) -> some View
     ) where V.InitData == Void {
-        let key = route.eraseToAnyRoute()
-        if registerMap[key] != nil {
-            PresentMonitor.shared.fatalError("Duplicate registration of PresentableView '\(key)'")
+        DispatchQueue.syncOnStoreQueue {
+            let key = route.eraseToAnyRoute()
+            if registerMap[key] != nil {
+                PresentMonitor.shared.fatalError("Duplicate registration of PresentableView '\(key)'")
+            }
+            registerMap[key] = .init(V.self, modifier)
         }
-        registerMap[key] = .init(V.self, modifier)
     }
 }
 
@@ -122,7 +154,10 @@ struct PresentableViewWrapper {
         self.init(presentableViewType, { $0 })
     }
     
-    init<V: PresentableView>(_ presentableViewType: V.Type, _ modifier: @escaping (AnyView) -> some View = { $0 }) {
+    init<V: PresentableView>(
+        _ presentableViewType: V.Type,
+        _ modifier: @Sendable @escaping (AnyView) -> some View = { $0 }
+    ) {
         self.check = { data in
             if data is V.InitData {
                 return data
@@ -150,7 +185,10 @@ struct PresentableViewWrapper {
         }
     }
     
-    init<V: PresentableView>(_ presentableViewType: V.Type, _ modifier: @escaping (AnyView) -> some View) where V.InitData == Void {
+    init<V: PresentableView>(
+        _ presentableViewType: V.Type,
+        _ modifier: @Sendable @escaping (AnyView) -> some View
+    ) where V.InitData == Void {
         self.check = { _ in () }
         self.run = { _ in
             return AnyView(V(Void()))

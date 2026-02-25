@@ -51,7 +51,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
     }
     
     @MainActor
-    func makeView(_ sceneId: SceneId, _ closeView: AnyView) -> AnyView {
+    func makeView(_ sceneId: SceneId, _ closeView: any View) -> AnyView {
         let presentStore = Store<PresentState>.shared(on: sceneId)
         var view = viewMaker.makeView(on: sceneId)
         view = AnyView(view.environment(\.suggestNavTitle, navigationState?.navigationTitle))
@@ -63,7 +63,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
                         Button {
                             presentStore.dismissViewOnLevel(level)
                         } label: {
-                            closeView
+                            AnyView(closeView)
                         }
                     }
                 }

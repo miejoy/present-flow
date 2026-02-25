@@ -6,7 +6,8 @@
 //
 
 import XCTest
-@testable import DataFlow
+@testable import ModuleMonitor
+import DataFlow
 import ViewFlow
 import Combine
 import SwiftUI

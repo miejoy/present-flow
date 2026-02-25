@@ -138,33 +138,38 @@ final class PresentCenterTests: XCTestCase {
         PresentCenter.shared.registerMap = [:]
         let presentCenter = PresentCenter.shared
         
-        var modifier1GetCall = false
+        class CaptureBox: @unchecked Sendable {
+            var value: Bool = false
+        }
+        
+        let modifier1GetCall = CaptureBox()
+        let modifier2GetCall = CaptureBox()
+        
         presentCenter.registerDefaultPresentableView(PresentFirstView.self) { view in
-            modifier1GetCall = true
+            modifier1GetCall.value = true
             return view
         }
         
         XCTAssertEqual(presentCenter.registerMap.count, 1)
         XCTAssertNotNil(presentCenter.registerMap[PresentFirstView.defaultRoute.eraseToAnyRoute()])
         
-        var modifier2GetCall = false
         presentCenter.registerDefaultPresentableView(PresentSecondView.self) { view in
-            modifier2GetCall = true
+            modifier2GetCall.value = true
             return view
         }
         XCTAssertEqual(presentCenter.registerMap.count, 2)
         XCTAssertNotNil(presentCenter.registerMap[PresentSecondView.defaultRoute.eraseToAnyRoute()])
         
         if let viewMaker = presentCenter.registerMap[PresentFirstView.defaultRoute.eraseToAnyRoute()] {
-            XCTAssertFalse(modifier1GetCall)
+            XCTAssertFalse(modifier1GetCall.value)
             _ = viewMaker.modifier(AnyView(EmptyView()))
-            XCTAssertTrue(modifier1GetCall)
+            XCTAssertTrue(modifier1GetCall.value)
         }
         
         if let viewMaker = presentCenter.registerMap[PresentSecondView.defaultRoute.eraseToAnyRoute()] {
-            XCTAssertFalse(modifier2GetCall)
+            XCTAssertFalse(modifier2GetCall.value)
             _ = viewMaker.modifier(AnyView(EmptyView()))
-            XCTAssertTrue(modifier2GetCall)
+            XCTAssertTrue(modifier2GetCall.value)
         }
     }
     
@@ -173,13 +178,17 @@ final class PresentCenterTests: XCTestCase {
         
         let sceneId = SceneId.custom("otherScene5")
         
-        var modifierGetCall = false
+        class CaptureBox: @unchecked Sendable {
+            var value: Bool = false
+        }
+        
+        let modifierGetCall = CaptureBox()
         
         let view = Text("test")
             .modifier(PresentModifier())
             .registerPresentOn { presentCenter in
                 presentCenter.registerDefaultPresentableView(PresentFirstView.self) { view in
-                    modifierGetCall = true
+                    modifierGetCall.value = true
                     return view
                 }
             }
@@ -188,14 +197,14 @@ final class PresentCenterTests: XCTestCase {
             }
             .environment(\.sceneId, sceneId)
         
-        XCTAssertFalse(modifierGetCall)
+        XCTAssertFalse(modifierGetCall.value)
         
         let host = ViewTest.host(view)
                 
         // 这里才会真正展示新界面，这里目前没有用
         ViewTest.refreshHost(host)
         
-        XCTAssertTrue(modifierGetCall)
+        XCTAssertTrue(modifierGetCall.value)
     }
 }
 
