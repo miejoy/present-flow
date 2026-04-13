@@ -85,7 +85,7 @@ public final class PresentCenter {
     @inlinable
     public func registerDefaultPresentableView<V: PresentableView>(
         _ presentableViewType: V.Type,
-        _ modifier: @Sendable @escaping (AnyView) -> some View
+        _ modifier: @MainActor @Sendable @escaping (AnyView) -> some View
     ) where V.InitData == Void {
         let route = V.defaultRoute
         registerPresentableView(V.self, for: route, modifier)
@@ -113,7 +113,7 @@ public final class PresentCenter {
     public func registerPresentableView<V: PresentableView>(
         _ presentableViewType: V.Type,
         for route: ViewRoute<V.InitData>,
-        _ modifier: @Sendable @escaping (AnyView) -> some View
+        _ modifier: @MainActor @Sendable @escaping (AnyView) -> some View
     ) {
         DispatchQueue.syncOnStoreQueue {
             let key = route.eraseToAnyRoute()
@@ -128,7 +128,7 @@ public final class PresentCenter {
     public func registerPresentableView<V: PresentableView>(
         _ presentableViewType: V.Type,
         for route: ViewRoute<V.InitData>,
-        _ modifier: @Sendable @escaping (AnyView) -> some View
+        _ modifier: @MainActor @Sendable @escaping (AnyView) -> some View
     ) where V.InitData == Void {
         DispatchQueue.syncOnStoreQueue {
             let key = route.eraseToAnyRoute()
@@ -156,7 +156,7 @@ struct PresentableViewWrapper {
     
     init<V: PresentableView>(
         _ presentableViewType: V.Type,
-        _ modifier: @Sendable @escaping (AnyView) -> some View = { $0 }
+        _ modifier: @MainActor @Sendable @escaping (AnyView) -> some View = { $0 }
     ) {
         self.check = { data in
             if data is V.InitData {
@@ -187,7 +187,7 @@ struct PresentableViewWrapper {
     
     init<V: PresentableView>(
         _ presentableViewType: V.Type,
-        _ modifier: @Sendable @escaping (AnyView) -> some View
+        _ modifier: @MainActor @Sendable @escaping (AnyView) -> some View
     ) where V.InitData == Void {
         self.check = { _ in () }
         self.run = { _ in
