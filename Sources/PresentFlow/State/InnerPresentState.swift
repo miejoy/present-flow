@@ -59,7 +59,7 @@ struct InnerPresentState: StorableState, ActionBindable, ReducerLoadableState {
             #if os(iOS) || os(tvOS)
             if navigationState.needCloseButton {
                 let toolbarView = view.toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
+                    ToolbarItem(placement: .topBarLeading) {
                         Button {
                             presentStore.dismissViewOnLevel(level)
                         } label: {
@@ -108,16 +108,25 @@ struct InnerPresentWrapper : @preconcurrency DynamicProperty {
     
     var wrappedValue: InnerPresentState {
         get {
-            storage.store!.state
+            guard let store = storage.store else {
+                fatalError("InnerPresentWrapper store is not configured. Ensure update() is called before accessing wrappedValue.")
+            }
+            return store.state
         }
         
         nonmutating set {
-            storage.store!.state = newValue
+            guard let store = storage.store else {
+                fatalError("InnerPresentWrapper store is not configured. Ensure update() is called before accessing wrappedValue.")
+            }
+            store.state = newValue
         }
     }
     
     var projectedValue: Store<InnerPresentState> {
-        storage.store!
+        guard let store = storage.store else {
+            fatalError("InnerPresentWrapper store is not configured. Ensure update() is called before accessing projectedValue.")
+        }
+        return store
     }
     
     func update() {

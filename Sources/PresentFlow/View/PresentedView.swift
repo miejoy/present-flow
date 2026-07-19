@@ -62,9 +62,11 @@ extension View {
     /// 在界面已经出现时调用，并且只调用一次
     public func onAppeared(perform action: (() -> Void)? = nil ) -> some View {
         #if canImport(UIKit)
-        self.overlay(UIKitAppeared(onAppeared: action).disabled(true))
+        self.overlay {
+            UIKitAppeared(onAppeared: action).disabled(true)
+        }
         #else
-        self.overlay(EmptyView())
+        self.overlay { EmptyView() }
         #endif
     }
 }
