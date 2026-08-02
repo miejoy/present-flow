@@ -80,6 +80,45 @@ extension Store where State == PresentState {
         self.send(action: .present(route, data))
     }
     
+    // MARK: -Present With ResultRoute (async throws)
+    
+    /// 展示对应结果路由的界面，等待界面返回结果
+    ///
+    /// - Parameter route: 需要展示界面的结果路由
+    /// - Parameter data: 初始化界面所需参数
+    /// - Returns: 界面返回的结果数据
+    /// - Throws: `ViewRouteError.cancelled` 用户取消；`ViewRouteError.failed` 路由展示失败
+    public func present<InitData: Sendable, ResultData: Sendable>(
+        _ route: ResultViewRoute<InitData, ResultData>,
+        _ data: InitData
+    ) async throws -> ResultData {
+        try await presentResultRoute(route, data)
+    }
+    
+    /// 展示对应结果路由的界面（无初始化参数），等待界面返回结果
+    ///
+    /// - Parameter route: 需要展示界面的结果路由
+    /// - Returns: 界面返回的结果数据
+    /// - Throws: `ViewRouteError.cancelled` 用户取消；`ViewRouteError.failed` 路由展示失败
+    public func present<ResultData: Sendable>(
+        _ route: ResultViewRoute<Void, ResultData>
+    ) async throws -> ResultData {
+        try await presentResultRoute(route, Void())
+    }
+    
+    /// 结果路由展示内部实现
+    private func presentResultRoute<InitData: Sendable, ResultData: Sendable>(
+        _ route: ResultViewRoute<InitData, ResultData>,
+        _ data: InitData
+    ) async throws -> ResultData {
+        try await withCheckedThrowingContinuation { continuation in
+            let resultRouteData = ResultableRouteData<InitData, ResultData>(data) { result in
+                continuation.resume(with: result.resultToResultData())
+            }
+            self.send(action: .present(route.wrapper(resultRouteData)))
+        }
+    }
+    
     // MARK: - Dismiss
     
     /// 消失最顶层界面
@@ -154,6 +193,45 @@ extension Store where State == PresentState {
     @inlinable
     public func presentFullCover(_ routeData: ViewRouteData) {
         self.send(action: .present(routeData, isFullCover: true))
+    }
+    
+    // MARK: - Present Full Cover With ResultRoute (async throws)
+    
+    /// 全屏展示对应结果路由的界面，等待界面返回结果
+    ///
+    /// - Parameter route: 需要展示界面的结果路由
+    /// - Parameter data: 初始化界面所需参数
+    /// - Returns: 界面返回的结果数据
+    /// - Throws: `ViewRouteError.cancelled` 用户取消；`ViewRouteError.failed` 路由展示失败
+    public func presentFullCover<InitData: Sendable, ResultData: Sendable>(
+        _ route: ResultViewRoute<InitData, ResultData>,
+        _ data: InitData
+    ) async throws -> ResultData {
+        try await presentFullCoverResultRoute(route, data)
+    }
+    
+    /// 全屏展示对应结果路由的界面（无初始化参数），等待界面返回结果
+    ///
+    /// - Parameter route: 需要展示界面的结果路由
+    /// - Returns: 界面返回的结果数据
+    /// - Throws: `ViewRouteError.cancelled` 用户取消；`ViewRouteError.failed` 路由展示失败
+    public func presentFullCover<ResultData: Sendable>(
+        _ route: ResultViewRoute<Void, ResultData>
+    ) async throws -> ResultData {
+        try await presentFullCoverResultRoute(route, Void())
+    }
+    
+    /// 全屏结果路由展示内部实现
+    private func presentFullCoverResultRoute<InitData: Sendable, ResultData: Sendable>(
+        _ route: ResultViewRoute<InitData, ResultData>,
+        _ data: InitData
+    ) async throws -> ResultData {
+        try await withCheckedThrowingContinuation { continuation in
+            let resultRouteData = ResultableRouteData<InitData, ResultData>(data) { result in
+                continuation.resume(with: result.resultToResultData())
+            }
+            self.send(action: .present(route.wrapper(resultRouteData), isFullCover: true))
+        }
     }
     
 }

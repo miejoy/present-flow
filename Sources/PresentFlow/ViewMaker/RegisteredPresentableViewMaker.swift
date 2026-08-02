@@ -62,4 +62,14 @@ struct RegisteredPresentableViewMaker: PresentedViewMaker, @unchecked Sendable {
         
         return view
     }
+    
+    // MARK: - CancellableRouteData
+    
+    func cancelRoute() {
+        (initData as? CancellableRouteData)?.cancelRoute()
+    }
+    
+    func failRoute(reason: String) {
+        (initData as? CancellableRouteData)?.failRoute(reason: reason)
+    }
 }

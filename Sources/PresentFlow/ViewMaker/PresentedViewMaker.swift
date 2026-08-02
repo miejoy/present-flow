@@ -15,12 +15,18 @@ protocol PresentedViewMaker: Sendable {
     func makeView(on sceneId: SceneId) -> AnyView
     @MainActor
     func modify(on sceneId: SceneId, _ view: AnyView) -> AnyView
+    /// 取消路由（展示成功后界面被关闭时调用，对非结果路由为 no-op）
+    func cancelRoute()
+    /// 路由展示失败时调用（对非结果路由为 no-op）
+    func failRoute(reason: String)
 }
 
 extension PresentedViewMaker {
     func modify(on sceneId: SceneId, _ view: AnyView) -> AnyView {
         return view
     }
+    func cancelRoute() {}
+    func failRoute(reason: String) {}
 }
 
 extension EmptyView: PresentedViewMaker {

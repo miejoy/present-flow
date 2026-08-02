@@ -191,6 +191,65 @@ struct PresentSecondView: VoidPresentableView {
 }
 ```
 
+### 使用结果路由获取界面返回值
+
+展示界面并等待其返回结果，适用于选择器、表单确认等场景。界面通过 `finishRoute(_:)` 返回结果，`cancelRoute()` 表示取消，`failRoute(reason:)` 表示失败。
+
+界面需同时遵循 `PresentableView` 和 `ResultableView` 协议：
+
+```swift
+import SwiftUI
+import PresentFlow
+import ViewFlow
+
+struct ItemPickerView: PresentableView, ResultableView {
+    typealias InitParam = [String]
+    typealias ResultData = String
+
+    let routeData: ResultableRouteData<[String], String>
+
+    init(_ routeData: ResultableRouteData<[String], String>) {
+        self.routeData = routeData
+    }
+
+    var content: some View {
+        List(routeData.initData, id: \.self) { item in
+            Button(item) {
+                // 选中后返回结果
+                routeData.finishRoute(item)
+            }
+        }
+    }
+}
+```
+
+调用方使用 `async throws` 方式展示并等待结果：
+
+```swift
+// 注册路由
+PresentCenter.shared.registerDefaultPresentableView(ItemPickerView.self)
+
+// 展示并等待用户选择
+do {
+    let picked = try await presentManager.present(ItemPickerView.defaultRoute, ["A", "B", "C"])
+    print("用户选择了: \(picked)")
+} catch ViewRouteError.cancelled {
+    print("用户取消了选择")
+} catch ViewRouteError.failed(let reason) {
+    print("展示失败: \(reason)")
+}
+```
+
+也支持全屏覆盖模式和无初始化参数的路由：
+
+```swift
+// 全屏覆盖
+let result = try await presentManager.presentFullCover(ItemPickerView.defaultRoute, items)
+
+// 无初始化参数
+let confirmed = try await presentManager.present(VoidConfirmView.defaultRoute)
+```
+
 ## 作者
 
 Raymond.huang: raymond0huang@gmail.com

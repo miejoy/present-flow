@@ -33,12 +33,14 @@ enum PresentReducer {
         let baseOnLevel = getTargetLevel(on: store, state, action.baseOnLevel, &notFoundError)
         if let notFoundError = notFoundError {
             PresentMonitor.shared.record(event: .presentFailed(action.route, notFoundError))
+            action.viewMaker.failRoute(reason: "Base level not found: \(notFoundError)")
             return
         }
         
         var viewMaker = action.viewMaker
         if !viewMaker.canMakeView(on: state.sceneId) {
             PresentMonitor.shared.record(event: .presentFailedCannotMakeView(action.route))
+            action.viewMaker.failRoute(reason: "Cannot make view for route: \(action.route.description)")
             return
         }
         var innerPresentState = InnerPresentState(level: baseOnLevel + 1,
@@ -150,7 +152,9 @@ enum PresentReducer {
             if state.topLevel == state.curLevel && state.curLevel == state.turnAroundLevel {
                 // 被动销毁最顶层
                 while store.storage.innerPresentStores.count > state.curLevel  {
-                    _ = store.storage.innerPresentStores.popLast()
+                    if let arrStores = store.storage.innerPresentStores.popLast() {
+                        arrStores.forEach { $0.state.viewMaker.cancelRoute() }
+                    }
                 }
                 state.curLevel -= 1
                 state.topLevel = state.curLevel
@@ -159,13 +163,16 @@ enum PresentReducer {
             }
             // 存在转折，因为 turnAroundLevel <= 其他两个 level，三个 level 又不完全相等，必然 turnAroundLevel < Min(curLevel, topLevel)
             if state.topLevel >= state.curLevel {
-                // 当前层需要保留最新 store
+                // 当前层需要保留最新 store，其余的取消路由
                 let arrStores = store.storage.innerPresentStores[Int(state.curLevel)]
+                arrStores.dropFirst().forEach { $0.state.viewMaker.cancelRoute() }
                 store.storage.innerPresentStores[Int(state.curLevel)] = .init(arrStores.prefix(1))
             } else {
                 // curLevel > topLevel, 完全是多出来的，可以直接移除
                 while store.storage.innerPresentStores.count > state.curLevel  {
-                    _ = store.storage.innerPresentStores.popLast()
+                    if let arrStores = store.storage.innerPresentStores.popLast() {
+                        arrStores.forEach { $0.state.viewMaker.cancelRoute() }
+                    }
                 }
             }
             state.curLevel -= 1
