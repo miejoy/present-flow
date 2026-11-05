@@ -17,6 +17,8 @@ public struct PresentAction: Action {
         let navigationState: NavigationState?
         var isFrozen = false
         var isFullCover = false
+        /// 是否使用过渡动画。默认 true
+        var animation = true
         
         var baseOnLevel: PresentLevelOf?
     }
@@ -28,6 +30,19 @@ public struct PresentAction: Action {
         
         /// 目标层，没有的话则是最上层
         var targetLevel: PresentLevelOf?
+        
+        /// 是否使用过渡动画。默认 true
+        var animation: Bool = true
+        
+        init(
+            dismissCount: UInt,
+            targetLevel: PresentLevelOf? = nil,
+            animation: Bool = true
+        ) {
+            self.dismissCount = dismissCount
+            self.targetLevel = targetLevel
+            self.animation = animation
+        }
     }
     
     /// 冻结相关事件
@@ -137,6 +152,7 @@ extension PresentAction {
         needCloseButton: Bool = false,
         needFreeze: Bool = false,
         isFullCover: Bool = false,
+        animation: Bool = true,
         baseOn: PresentLevelOf?
     ) -> Self {
         var navState: NavigationState? = nil
@@ -148,6 +164,7 @@ extension PresentAction {
         }
         var presentAction = InnerPresentAction(route: P.defaultRoute.eraseToAnyRoute(), viewMaker: viewMaker, navigationState: navState, isFrozen: needFreeze)
         presentAction.baseOnLevel = baseOn
+        presentAction.animation = animation
         #if os(iOS) || os(tvOS) || os(watchOS)
         if isFullCover {
             presentAction.isFullCover = isFullCover
@@ -225,6 +242,7 @@ extension PresentAction {
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
     /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
+    /// - Parameter animation: 是否使用过渡动画。默认 true
     /// - Parameter baseOnLevel: 基于某一层展示界面，这个层级必须小于等于展示流的最顶层层级
     /// - Returns Self: 返回构造好的自己
     public static func present<P: VoidPresentableView>(
@@ -233,6 +251,7 @@ extension PresentAction {
         needCloseButton: Bool = false,
         needFreeze: Bool = false,
         isFullCover: Bool = false,
+        animation: Bool = true,
         baseOnLevel: UInt? = nil
     ) -> Self {
         present(
@@ -242,6 +261,7 @@ extension PresentAction {
             needCloseButton: needCloseButton,
             needFreeze: needFreeze,
             isFullCover: isFullCover,
+            animation: animation,
             baseOn: (baseOnLevel != nil) ? .level(baseOnLevel!) : nil
         )
     }
@@ -282,6 +302,7 @@ extension PresentAction {
         needCloseButton: Bool = false,
         needFreeze: Bool = false,
         isFullCover: Bool = false,
+        animation: Bool = true,
         baseOn: PresentLevelOf?
     ) -> Self {
         var navState: NavigationState? = nil
@@ -291,6 +312,7 @@ extension PresentAction {
         let viewMaker = PresentableViewMaker<P>(data: data)
         var presentAction = InnerPresentAction(route: P.defaultRoute.eraseToAnyRoute(), viewMaker: viewMaker, navigationState: navState, isFrozen: needFreeze)
         presentAction.baseOnLevel = baseOn
+        presentAction.animation = animation
         #if os(iOS) || os(tvOS) || os(watchOS)
         if isFullCover {
             presentAction.isFullCover = isFullCover
@@ -309,6 +331,7 @@ extension PresentAction {
     /// - Parameter needCloseButton: 是否需要导航栏关闭按钮，只要 navTitle 有值时，该设置才会生效。默认不设置
     /// - Parameter needFreeze: 是否需要冻结展示界面。默认 false
     /// - Parameter isFullCover: 是否使用全屏展示，只在 iOS || tvOS || watchOS 平台可用。默认 false
+    /// - Parameter animation: 是否使用过渡动画。默认 true
     /// - Parameter baseOnLevel: 基于某一层展示界面，这个层级必须小于等于展示流的最顶层层级
     /// - Returns Self: 返回构造好的自己
     public static func present<InitData>(
@@ -318,6 +341,7 @@ extension PresentAction {
         needCloseButton: Bool = false,
         needFreeze: Bool = false,
         isFullCover: Bool = false,
+        animation: Bool = true,
         baseOnLevel: UInt? = nil
     ) -> Self {
         present(
@@ -327,6 +351,7 @@ extension PresentAction {
             needCloseButton: needCloseButton,
             needFreeze: needFreeze,
             isFullCover: isFullCover,
+            animation: animation,
             baseOn: (baseOnLevel != nil) ? .level(baseOnLevel!) : nil
         )
     }
@@ -425,9 +450,10 @@ extension PresentAction {
         needCloseButton: Bool = false,
         needFreeze: Bool = false,
         isFullCover: Bool = false,
+        animation: Bool = true,
         baseOn: PresentLevelOf?
     ) -> Self {
-        return .present(route.wrapper(data), navTitle: navTitle, needCloseButton: needCloseButton, needFreeze: needFreeze, isFullCover: isFullCover, baseOn: baseOn)
+        return .present(route.wrapper(data), navTitle: navTitle, needCloseButton: needCloseButton, needFreeze: needFreeze, isFullCover: isFullCover, animation: animation, baseOn: baseOn)
     }
     
     // MARK: -Present With RouteData
@@ -494,6 +520,7 @@ extension PresentAction {
         needCloseButton: Bool = false,
         needFreeze: Bool = false,
         isFullCover: Bool = false,
+        animation: Bool = true,
         baseOn: PresentLevelOf?
     ) -> Self {
         var navState: NavigationState? = nil
@@ -503,6 +530,7 @@ extension PresentAction {
         let viewMaker = RegisteredPresentableViewMaker(routeData: routeData)
         var presentAction = InnerPresentAction(route: routeData.route, viewMaker: viewMaker, navigationState: navState, isFrozen: needFreeze)
         presentAction.baseOnLevel = baseOn
+        presentAction.animation = animation
         #if os(iOS) || os(tvOS) || os(watchOS)
         if isFullCover {
             presentAction.isFullCover = isFullCover
@@ -607,41 +635,46 @@ extension PresentAction {
     
     /// 消失最上层展示界面
     ///
+    /// - Parameter animation: 是否使用过渡动画。默认 true
     /// - Returns Self: 返回构造好的自己
-    public static func dismissTopView() -> Self {
-        .init(action: .dismiss(.init(dismissCount: 1)))
+    public static func dismissTopView(animation: Bool = true) -> Self {
+        .init(action: .dismiss(.init(dismissCount: 1, animation: animation)))
     }
     
     /// 消失指定路由的界面，对应界面上层界面也会同时消失
     ///
     /// - Parameter route: 需要消失界面对应的路由
+    /// - Parameter animation: 是否使用过渡动画。默认 true
     /// - Returns Self: 返回构造好的自己
-    public static func dismissViewOnRoute<InitData>(_ route: ViewRoute<InitData>) -> Self {
-        .init(action: .dismiss(.init(dismissCount: 1, targetLevel:.route(route.eraseToAnyRoute()))))
+    public static func dismissViewOnRoute<InitData>(_ route: ViewRoute<InitData>, animation: Bool = true) -> Self {
+        .init(action: .dismiss(.init(dismissCount: 1, targetLevel:.route(route.eraseToAnyRoute()), animation: animation)))
     }
     
     /// 消失指定层的界面，对应界面上层界面也会同时消失
     ///
     /// - Parameter level: 需要消失界面对应的层级
+    /// - Parameter animation: 是否使用过渡动画。默认 true
     /// - Returns Self: 返回构造好的自己
-    public static func dismissViewOnLevel(_ level: UInt) -> Self {
-        .init(action: .dismiss(.init(dismissCount: 1, targetLevel: .level(level))))
+    public static func dismissViewOnLevel(_ level: UInt, animation: Bool = true) -> Self {
+        .init(action: .dismiss(.init(dismissCount: 1, targetLevel: .level(level), animation: animation)))
     }
     
     /// 消失指定路由的界面以上的界面
     ///
     /// - Parameter route: 需要消失以上界面对应的路由
+    /// - Parameter animation: 是否使用过渡动画。默认 true
     /// - Returns Self: 返回构造好的自己
-    public static func dismissToViewOnRoute<InitData>(_ route: ViewRoute<InitData>) -> Self {
-        .init(action: .dismiss(.init(dismissCount: 0, targetLevel: .route(route.eraseToAnyRoute()))))
+    public static func dismissToViewOnRoute<InitData>(_ route: ViewRoute<InitData>, animation: Bool = true) -> Self {
+        .init(action: .dismiss(.init(dismissCount: 0, targetLevel: .route(route.eraseToAnyRoute()), animation: animation)))
     }
     
     /// 消失指定层以上的界面
     ///
     /// - Parameter level: 需要消失以上界面对应的层级
+    /// - Parameter animation: 是否使用过渡动画。默认 true
     /// - Returns Self: 返回构造好的自己
-    public static func dismissToViewOnLevel(_ level: UInt) -> Self {
-        .init(action: .dismiss(.init(dismissCount: 0, targetLevel: .level(level))))
+    public static func dismissToViewOnLevel(_ level: UInt, animation: Bool = true) -> Self {
+        .init(action: .dismiss(.init(dismissCount: 0, targetLevel: .level(level), animation: animation)))
     }
 }
 

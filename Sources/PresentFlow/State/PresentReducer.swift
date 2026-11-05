@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 import DataFlow
 import ViewFlow
 
@@ -78,7 +79,7 @@ enum PresentReducer {
             state.turnAroundLevel = baseOnLevel
         }
         
-        checkSeekingOn(store, &state)
+        checkSeekingOn(store, &state, animation: action.animation)
     }
     
     // MARK: - Dismiss
@@ -101,7 +102,7 @@ enum PresentReducer {
             state.turnAroundLevel = state.topLevel
         }
         
-        checkSeekingOn(store, &state)
+        checkSeekingOn(store, &state, animation: action.animation)
     }
     
     // MARK: - Freeze
@@ -213,7 +214,7 @@ enum PresentReducer {
     
     /// 检查搜索回转状态，只有在 内部 disAppear 的时候 byForce = true，原因是这时候 isSeekingTurn = true
     @MainActor
-    static func checkSeekingOn(_ store: Store<PresentState>, _ state: inout PresentState, _ byForce: Bool = false) {
+    static func checkSeekingOn(_ store: Store<PresentState>, _ state: inout PresentState, _ byForce: Bool = false, animation: Bool = true) {
         // turnAroundLevel 只可能 <= curLevel 并且 <= topLevel, 即 turnAroundLevel 必然是 三个中的最小值
         if state.curLevel == state.turnAroundLevel {
             // 直接转到 topLevel，因为 topLevel 不可能 < turnAroundLevel, 所以 topLevel >= curLevel
@@ -222,7 +223,15 @@ enum PresentReducer {
                 let prevIsFullCover = store.storage.innerPresentStores[Int(state.curLevel + 1)].first?.isFullCover ?? false
                 if let processStore = store.storage.innerPresentStores[Int(state.curLevel)].last {
                     if !processStore.isPresenting && !processStore.isFullCoverPresenting {
-                        processStore.apply(action: .present(prevIsFullCover))
+                        if animation {
+                            processStore.apply(action: .present(prevIsFullCover))
+                        } else {
+                            var transaction = Transaction()
+                            transaction.disablesAnimations = true
+                            withTransaction(transaction) {
+                                processStore.apply(action: .present(prevIsFullCover))
+                            }
+                        }
                     }
                 } else {
                     // 这里存在问题 fault
@@ -252,7 +261,15 @@ enum PresentReducer {
                 PresentMonitor.shared.fatalError("Internal error. Prev inner present store not exist")
                 return
             }
-            prevStore.apply(action: .dismiss)
+            if animation {
+                prevStore.apply(action: .dismiss)
+            } else {
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                withTransaction(transaction) {
+                    prevStore.apply(action: .dismiss)
+                }
+            }
         }
     }
 }

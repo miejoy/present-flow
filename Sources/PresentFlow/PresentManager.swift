@@ -40,15 +40,25 @@ extension Store where State == PresentState {
         self.send(action: .present(P.self))
     }
     
+    /// 展示对应界面
+    ///
+    /// - Parameter viewType: 需要展示的界面类型
+    /// - Parameter animation: 是否使用过渡动画。默认 true
+    @inlinable
+    public func present<P: VoidPresentableView>(_ viewType: P.Type, animation: Bool) {
+        self.send(action: .present(P.self, animation: animation))
+    }
+    
     // MARK: -Present With Route
     
     /// 展示对应路由的界面，使用路由操作前，必须确保对应路由已使用 PresentCenter 注册
     ///
     /// - Parameter route: 需要展示界面的路由
     /// - Parameter data: 初始化展示界面需要的数据
+    /// - Parameter animation: 是否使用过渡动画。默认 true
     @inlinable
-    public func present<InitData>(_ route: ViewRoute<InitData>, _ data: InitData) {
-        self.send(action: .present(route, data))
+    public func present<InitData>(_ route: ViewRoute<InitData>, _ data: InitData, animation: Bool = true) {
+        self.send(action: .present(route, data, animation: animation))
     }
     
     /// 展示对应路由的界面，使用路由操作前，必须确保对应路由已使用 PresentCenter 注册
@@ -170,13 +180,23 @@ extension Store where State == PresentState {
         self.send(action: .present(P.self, isFullCover: true))
     }
     
+    /// 展示对应界面
+    ///
+    /// - Parameter viewType: 需要展示的界面类型
+    /// - Parameter animation: 是否使用过渡动画。默认 true
+    @inlinable
+    public func presentFullCover<P: VoidPresentableView>(_ viewType: P.Type, animation: Bool) {
+        self.send(action: .present(P.self, isFullCover: true, animation: animation))
+    }
+    
     /// 展示对应路由的界面，使用路由操作前，必须确保对应路由已使用 PresentCenter 注册
     ///
     /// - Parameter route: 需要展示界面的路由
     /// - Parameter data: 初始化展示界面需要的数据
+    /// - Parameter animation: 是否使用过渡动画。默认 true
     @inlinable
-    public func presentFullCover<InitData>(_ route: ViewRoute<InitData>, _ data: InitData) {
-        self.send(action: .present(route, data, isFullCover: true))
+    public func presentFullCover<InitData>(_ route: ViewRoute<InitData>, _ data: InitData, animation: Bool = true) {
+        self.send(action: .present(route, data, isFullCover: true, animation: animation))
     }
     
     /// 展示对应路由的界面，使用路由操作前，必须确保对应路由已使用 PresentCenter 注册
